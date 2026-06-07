@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteSquad - Gestión de Turnos</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- ENCABEZADO BYTESQUAD -->
+        <header onclick="irA('inicio')">
+            <div class="logo-icono">🟦🟨</div>
+            <h1 class="titulo-principal">ByteSquad</h1>
+            <p class="subtitulo-principal">Sistema de Gestión Médica Integral</p>
+        </header>
+
+        <main>
+            <!-- PANTALLA 1: INICIO -->
+            <div id="pantalla-inicio" class="pantalla activa">
+                <div class="contenedor-portal">
+                    <div class="tarjeta-inicio">
+                        <div style="font-size: 40px; margin-bottom: 10px;">👋</div>
+                        <h2>Portal Pacientes</h2>
+                        <p>Busca un médico, elige tu horario y reserva tu turno en segundos.</p>
+                        <button class="btn" onclick="iniciarReserva()">¡Quiero un turno!</button>
+                    </div>
+
+                    <div class="tarjeta-inicio">
+                        <div style="font-size: 40px; margin-bottom: 10px;">👩‍💻</div>
+                        <h2>Secretaría</h2>
+                        <p>Gestión de agenda médica, horarios y sobreturnos.</p>
+                        <!-- Cambiamos para que primero valide el login -->
+                        <button class="btn btn-secundario" onclick="intentarIngresoSecretaria()">Ingresar al
+                            Sistema</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 MÓDULO: SEGURIDAD (LOGIN)
+                 ========================================== -->
+            <div id="pantalla-login" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Seguridad</span>
+                    <h2>Acceso Restringido</h2>
+                </div>
+                <div class="formulario" style="max-width: 400px;">
+                    <p style="text-align: center; color: var(--color-texto-claro);">Ingrese sus credenciales para
+                        acceder al panel de administración.</p>
+
+                    <div class="grupo-input">
+                        <label for="login-usuario">Usuario</label>
+                        <input class="campo-texto" type="text" id="login-usuario" placeholder="Ej: admin">
+                    </div>
+
+                    <div class="grupo-input">
+                        <label for="login-password">Contraseña</label>
+                        <input class="campo-texto" type="password" id="login-password" placeholder="***">
+                    </div>
+
+                    <button class="btn btn-verde" style="margin-top: 10px;" onclick="procesarLogin()">Iniciar
+                        Sesión</button>
+                    <button class="btn btn-gris" onclick="irA('inicio')">Volver al Inicio</button>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 MÓDULO: PACIENTES
+                 ========================================== -->
+
+            <div id="pantalla-especialidades" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Paso 1</span>
+                    <h2>¿En qué especialidad necesitas turno?</h2>
+                </div>
+                <div class="grilla-avatares" id="contenedor-especialidades"></div>
+            </div>
+
+            <div id="pantalla-profesionales" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Paso 2</span>
+                    <h2>Elige a tu especialista</h2>
+                </div>
+                <div class="grilla-avatares" id="contenedor-profesionales"></div>
+            </div>
+
+            <div id="pantalla-dias" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Paso 3</span>
+                    <h2>Días con agenda disponible</h2>
+                </div>
+                <div class="calendario">
+                    <div
+                        style="text-align: center; font-weight: 900; font-size: 20px; color: var(--color-principal); margin-bottom: 20px;">
+                        Julio 2026</div>
+                    <div class="dias-semana">
+                        <div>Lun</div>
+                        <div>Mar</div>
+                        <div>Mié</div>
+                        <div>Jue</div>
+                        <div>Vie</div>
+                        <div>Sáb</div>
+                        <div>Dom</div>
+                    </div>
+                    <div class="dias-numeros" id="contenedor-calendario"></div>
+                </div>
+            </div>
+
+            <div id="pantalla-horarios" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Paso 4</span>
+                    <h2>Selecciona la hora</h2>
+                </div>
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <span style="font-weight: 900; font-size: 20px; color: var(--color-principal);"
+                        id="titulo-fecha-elegida">Fecha</span>
+                    <br><a href="#" onclick="irA('dias')"
+                        style="color: var(--color-texto-claro); font-size: 14px; text-decoration: underline; display: inline-block;">Cambiar
+                        de día</a>
+                </div>
+                <div class="grilla-avatares" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));"
+                    id="contenedor-horarios"></div>
+            </div>
+
+            <div id="pantalla-datos" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">¡Último paso!</span>
+                    <h2>Confirma tus datos</h2>
+                </div>
+                <div class="formulario" style="max-width: 450px;">
+                    <div style="background-color: #ECFDF5; color: #065F46; padding: 20px; border-radius: 20px; border: 2px dashed #34D399; text-align: center; line-height: 1.6;"
+                        id="resumen-turno"></div>
+                    <div class="grupo-input">
+                        <label for="dni">Tu DNI</label>
+                        <input class="campo-texto" type="number" id="dni" placeholder="Ej: 30123456" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="celular">Teléfono Celular</label>
+                        <input class="campo-texto" type="number" id="celular" placeholder="Código de área + número"
+                            required>
+                    </div>
+                    <button class="btn btn-verde" style="margin-top: 10px;" onclick="finalizarReserva()">Confirmar
+                        Turno</button>
+                    <button class="btn btn-gris" onclick="irA('horarios')">Volver atrás</button>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 MÓDULO: SECRETARÍA
+                 ========================================== -->
+
+            <div id="pantalla-secretaria-menu" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Administración</span>
+                    <h2>Panel de Secretaría</h2>
+                </div>
+                <div class="contenedor-portal">
+                    <div class="tarjeta-inicio">
+                        <div style="font-size: 40px; margin-bottom: 10px;">⚡</div>
+                        <h2>Turno Rápido</h2>
+                        <p>Busca pacientes y asigna turnos manualmente.</p>
+                        <button class="btn" onclick="abrirTurnoRapido()">Ir a Turnos</button>
+                    </div>
+                    <div class="tarjeta-inicio">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
+                        <h2>Configurar Agenda</h2>
+                        <p>Asigna qué días atiende cada profesional.</p>
+                        <button class="btn btn-secundario" onclick="abrirConfiguracionAgenda()">Ir a Agenda</button>
+                    </div>
+                </div>
+
+                <!-- Botón para cerrar sesión de secretaría -->
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="btn-rojo-chico" onclick="cerrarSesion()">🔒 Cerrar Sesión</button>
+                </div>
+            </div>
+
+            <!-- Secretaría: Configurar Agenda -->
+            <div id="pantalla-agenda" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Secretaría > Agenda</span>
+                    <h2>Configurar Días de Atención</h2>
+                </div>
+
+                <div class="formulario">
+                    <div class="fila-inputs">
+                        <div class="grupo-input">
+                            <label>Seleccionar Profesional</label>
+                            <select class="campo-texto" id="agenda-profesional" onchange="renderizarDiasAgenda()">
+                                <!-- Llenado por JS -->
+                            </select>
+                        </div>
+                        <div class="grupo-input">
+                            <label>Agregar Día (Julio 2026)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input class="campo-texto" type="date" id="agenda-fecha" min="2026-07-01"
+                                    max="2026-07-31">
+                                <button class="btn btn-verde" style="width: auto; padding: 0 20px;"
+                                    onclick="agregarDiaAgenda()">➕</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grupo-input"
+                        style="background: #F9FAFB; padding: 20px; border-radius: 15px; border: 1px solid #E5E7EB;">
+                        <label style="color: var(--color-principal);">Días Asignados en el Mes</label>
+                        <p style="font-size: 13px; color: var(--color-texto-claro); margin-top: 0;">Los pacientes solo
+                            verán estos días en el calendario web.</p>
+
+                        <div class="lista-agenda" id="contenedor-dias-agenda">
+                            <!-- JS inyecta las pastillas de los días aquí -->
+                        </div>
+                    </div>
+
+                    <button class="btn btn-gris" onclick="irA('secretaria-menu')">Volver al Menú</button>
+                </div>
+            </div>
+
+            <!-- Secretaría: Turno Rápido -->
+            <div id="pantalla-secretaria" class="pantalla">
+                <div class="cabecera-reserva">
+                    <span class="ruta-badge">Secretaría > Turnos</span>
+                    <h2>Alta de Turno Rápido</h2>
+                </div>
+
+                <div class="formulario">
+                    <div class="fila-inputs">
+                        <div class="grupo-input">
+                            <label>Buscador de Paciente</label>
+                            <input class="campo-texto" type="text" id="buscador-rapido" placeholder="DNI o Nombre..."
+                                oninput="simularAutocompletar()">
+                            <span id="mensaje-autocompletado"
+                                style="display:none; color: var(--color-secundario); font-size: 12px; font-weight: bold; margin-top: 5px;">✅
+                                Paciente encontrado</span>
+                        </div>
+                        <div class="grupo-input">
+                            <label>Profesional</label>
+                            <select class="campo-texto" id="select-profesional-rapido">
+                                <!-- JS inyecta opciones -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="fila-inputs">
+                        <div class="grupo-input">
+                            <label>Fecha del Turno</label>
+                            <input class="campo-texto" type="date" id="fecha-rapida" min="2026-07-01" max="2026-07-31"
+                                onchange="generarGrillaRapida()">
+                        </div>
+                        <div class="grupo-input">
+                            <label>Obra Social</label>
+                            <select class="campo-texto" id="obra-social">
+                                <option>Particular</option>
+                                <option>OSDE</option>
+                                <option>Swiss Medical</option>
+                                <option>OSEP</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grupo-input">
+                        <label>Selección de Horario</label>
+                        <div id="mensaje-seleccionar-fecha"
+                            style="text-align:center; padding: 20px; background: #F3F4F6; border-radius: 15px; color: var(--color-texto-claro);">
+                            Indique una fecha para ver la disponibilidad.
+                        </div>
+                        <div class="grilla-avatares" style="display: none; gap: 10px;" id="grilla-horarios-rapida">
+                        </div>
+                    </div>
+
+                    <div class="grupo-input">
+                        <label>Motivo / Observaciones (Opcional)</label>
+                        <input class="campo-texto" type="text" id="motivo-turno" placeholder="Ej: Control de rutina...">
+                    </div>
+
+                    <label class="checkbox-amigable">
+                        <input type="checkbox" id="recordatorio-wpp" checked>
+                        📱 Enviar recordatorio por WhatsApp al guardar
+                    </label>
+
+                    <div class="fila-inputs" style="margin-top: 15px;">
+                        <button class="btn btn-gris" onclick="irA('secretaria-menu')">Cancelar</button>
+                        <button class="btn btn-verde" onclick="guardarTurnoRapido()">Guardar Turno</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<script src="script.js"></script>
+</body>
+
+</html>

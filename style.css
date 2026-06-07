@@ -1,0 +1,503 @@
+/*SECCIÓN CSS: Estilo "Amigable / Soft UI"
+    Incluye mejoras específicas para pantallas móviles y accesibilidad. 
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+:root {
+    --color-fondo: #F3F4F6;
+    --color-principal: #3B82F6;
+    /* Azul ByteSquad */
+    --color-principal-hover: #2563EB;
+    --color-secundario: #10B981;
+    /* Verde para guardar/confirmar */
+    --color-blanco: #FFFFFF;
+    --color-texto-oscuro: #1F2937;
+    --color-texto-claro: #6B7280;
+    --sombra-suave: 0 10px 25px rgba(59, 130, 246, 0.1);
+    --sombra-hover: 0 20px 35px rgba(59, 130, 246, 0.2);
+}
+
+body {
+    font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif;
+    background-color: var(--color-fondo);
+    color: var(--color-texto-oscuro);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#app {
+    width: 100%;
+    max-width: 850px;
+    background-color: var(--color-blanco);
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+}
+
+/* Encabezado */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+header:hover {
+    transform: scale(1.02);
+}
+
+.logo-icono {
+    font-size: 50px;
+    margin: 0;
+    line-height: 1;
+}
+
+.titulo-principal {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--color-principal);
+    margin: 10px 0 5px 0;
+    letter-spacing: -1px;
+}
+
+.subtitulo-principal {
+    font-size: 16px;
+    color: var(--color-texto-claro);
+    margin: 0;
+}
+
+/* Pantallas */
+.pantalla {
+    display: none;
+    animation: flotar 0.4s ease-out;
+}
+
+.pantalla.activa {
+    display: block;
+}
+
+@keyframes flotar {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- TARJETAS DE INICIO Y MENÚ --- */
+.contenedor-portal {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tarjeta-inicio {
+    background-color: var(--color-fondo);
+    border-radius: 25px;
+    padding: 30px;
+    text-align: center;
+    flex: 1;
+    min-width: 250px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tarjeta-inicio:hover {
+    background-color: var(--color-blanco);
+    border-color: var(--color-principal);
+    box-shadow: var(--sombra-suave);
+    transform: translateY(-5px);
+}
+
+.tarjeta-inicio h2 {
+    margin: 0 0 10px 0;
+}
+
+.tarjeta-inicio p {
+    color: var(--color-texto-claro);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* --- BOTONES GLOBALES --- */
+.btn {
+    background-color: var(--color-principal);
+    color: var(--color-blanco);
+    border: none;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.btn:hover {
+    background-color: var(--color-principal-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secundario {
+    background-color: #E5E7EB;
+    color: var(--color-texto-oscuro);
+    box-shadow: none;
+}
+
+.btn-secundario:hover {
+    background-color: #D1D5DB;
+}
+
+.btn-verde {
+    background-color: var(--color-secundario);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-verde:hover {
+    background-color: #059669;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-gris {
+    background-color: #9CA3AF;
+    box-shadow: none;
+}
+
+.btn-gris:hover {
+    background-color: #6B7280;
+    transform: none;
+}
+
+.btn-rojo-chico {
+    background-color: #EF4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-rojo-chico:hover {
+    background-color: #DC2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+/* --- CABECERAS INTERNAS --- */
+.cabecera-reserva {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.ruta-badge {
+    display: inline-block;
+    background-color: #DBEAFE;
+    color: var(--color-principal);
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.cabecera-reserva h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+/* --- TARJETAS DE AVATARES (ESPECIALIDADES Y MÉDICOS) --- */
+.grilla-avatares {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.tarjeta-avatar {
+    background-color: var(--color-blanco);
+    border: 2px solid #E5E7EB;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tarjeta-avatar:hover {
+    border-color: var(--color-principal);
+    box-shadow: var(--sombra-hover);
+    transform: translateY(-8px);
+}
+
+.circulo-imagen {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 15px auto;
+    background-color: #F3F4F6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    /* Tamaño del Emoji */
+    border: 3px solid #DBEAFE;
+}
+
+.tarjeta-avatar span {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* --- CALENDARIO PACIENTE --- */
+.calendario {
+    background-color: var(--color-fondo);
+    padding: 30px;
+    border-radius: 25px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.dias-semana,
+.dias-numeros {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.dias-semana {
+    font-weight: bold;
+    color: var(--color-texto-claro);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.celda-dia {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #9CA3AF;
+}
+
+.celda-dia.disponible {
+    background-color: var(--color-blanco);
+    color: var(--color-texto-oscuro);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.celda-dia.disponible:hover {
+    background-color: var(--color-principal);
+    color: var(--color-blanco);
+    transform: scale(1.1);
+}
+
+/* --- FORMULARIOS GLOBALES --- */
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.grupo-input label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.campo-texto {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #E5E7EB;
+    border-radius: 15px;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: inherit;
+}
+
+.campo-texto:focus {
+    border-color: var(--color-principal);
+    box-shadow: 0 0 0 4px #DBEAFE;
+}
+
+/* --- COMPONENTES SECRETARÍA --- */
+.fila-inputs {
+    display: flex;
+    gap: 15px;
+}
+
+.fila-inputs>div {
+    flex: 1;
+}
+
+.hora-ocupada {
+    background-color: #FEE2E2 !important;
+    color: #EF4444 !important;
+    border: 2px solid #FECACA !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+.checkbox-amigable {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #F3F4F6;
+    border-radius: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Lista de Agenda */
+.lista-agenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.badge-dia {
+    background-color: #DBEAFE;
+    color: var(--color-principal);
+    padding: 8px 15px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* =========================================================================
+           MEDIA QUERIES - MEJORAS DE RESPONSIVIDAD PARA CELULARES Y MAYORES
+           ========================================================================= */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+        /* Recuperamos espacio en los bordes de la pantalla */
+    }
+
+    #app {
+        padding: 30px 20px;
+        border-radius: 20px;
+    }
+
+    /* Textos más grandes para mayor legibilidad */
+    .titulo-principal {
+        font-size: 28px;
+    }
+
+    .cabecera-reserva h2 {
+        font-size: 22px;
+    }
+
+    .ruta-badge {
+        font-size: 14px;
+        padding: 8px 18px;
+    }
+
+    /* Botones y campos de texto con áreas táctiles más amplias (Accesibilidad) */
+    .btn {
+        padding: 16px 20px;
+        font-size: 18px;
+    }
+
+    .campo-texto {
+        padding: 15px 18px;
+        font-size: 18px;
+    }
+
+    .grupo-input label {
+        font-size: 16px;
+    }
+
+    /* Tarjetas del menú a todo el ancho */
+    .tarjeta-inicio {
+        padding: 25px 20px;
+    }
+
+    /* Listas de especialidades y doctores: 
+               Pasan de grilla a lista en fila (como contactos) para que los botones sean anchos */
+    .grilla-avatares {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .tarjeta-avatar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        padding: 15px 20px;
+        gap: 20px;
+    }
+
+    .circulo-imagen {
+        margin: 0;
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+        flex-shrink: 0;
+    }
+
+    .tarjeta-avatar span {
+        font-size: 18px;
+    }
+
+    /* Horarios: Forzamos 2 columnas para que los botones de hora sean gigantes y fáciles de tocar */
+    #contenedor-horarios,
+    #grilla-horarios-rapida {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+    }
+
+    /* Calendario más cómodo para uso táctil */
+    .calendario {
+        padding: 20px 10px;
+    }
+
+    .celda-dia {
+        height: 50px;
+        font-size: 16px;
+    }
+
+    .dias-semana {
+        font-size: 15px;
+    }
+
+    /* Formularios apilados */
+    .fila-inputs {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .checkbox-amigable {
+        font-size: 14px;
+        padding: 15px 10px;
+    }
+}
