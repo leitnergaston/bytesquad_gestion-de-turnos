@@ -44,12 +44,7 @@ body {
 header {
     text-align: center;
     margin-bottom: 40px;
-    cursor: pointer;
     transition: transform 0.2s;
-}
-
-header:hover {
-    transform: scale(1.02);
 }
 
 .logo-icono {
@@ -80,6 +75,10 @@ header:hover {
 
 .pantalla.activa {
     display: block;
+}
+
+.version {
+    
 }
 
 @keyframes flotar {

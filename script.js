@@ -2,7 +2,7 @@
         // 1. BASE DE DATOS MEJORADA (Array de Objetos para enseñar estructuración)
         const datosBD = {
             especialidades: [
-                { nombre: "Cardiología", icono: "🫀" },
+                { nombre: "Cardiología", icono: "🩺" },
                 { nombre: "Dermatología", icono: "🧴" },
                 { nombre: "Kinesiología", icono: "🦴" },
                 { nombre: "Nutrición", icono: "🥗" },
