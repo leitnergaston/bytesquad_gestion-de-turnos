@@ -1,99 +1,136 @@
-/*SECCIÓN CSS: Estilo "Amigable / Soft UI"
-    Incluye mejoras específicas para pantallas móviles y accesibilidad. 
-*/
+/* ============================================================
+   TURNOSCLINIC — STYLESHEET
+   Soft Medical UI · Blue Professional Theme
+   ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap');
 
+/* ==================== VARIABLES ==================== */
 :root {
-    --color-fondo: #F3F4F6;
-    --color-principal: #3B82F6;
-    /* Azul ByteSquad */
-    --color-principal-hover: #2563EB;
-    --color-secundario: #10B981;
-    /* Verde para guardar/confirmar */
-    --color-blanco: #FFFFFF;
-    --color-texto-oscuro: #1F2937;
-    --color-texto-claro: #6B7280;
-    --sombra-suave: 0 10px 25px rgba(59, 130, 246, 0.1);
-    --sombra-hover: 0 20px 35px rgba(59, 130, 246, 0.2);
+    --color-fondo:            #EFF4FF;
+    --color-principal:        #2563EB;
+    --color-principal-hover:  #1D4ED8;
+    --color-principal-suave:  #DBEAFE;
+    --color-secundario:       #10B981;
+    --color-secundario-hover: #059669;
+    --color-blanco:           #FFFFFF;
+    --color-texto-oscuro:     #1E293B;
+    --color-texto-claro:      #64748B;
+    --color-borde:            #E2E8F0;
+    --color-fondo-card:       #F8FAFF;
+    --sombra-suave:           0 8px 24px rgba(37, 99, 235, 0.10);
+    --sombra-hover:           0 16px 40px rgba(37, 99, 235, 0.18);
+    --radio:                  20px;
+    --radio-sm:               12px;
 }
 
+/* ==================== RESET & BASE ==================== */
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
-    font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif;
-    background-color: var(--color-fondo);
+    font-family: 'Nunito', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #EFF4FF 0%, #E8F0FE 100%);
     color: var(--color-texto-oscuro);
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
 }
 
 #app {
     width: 100%;
-    max-width: 850px;
-    background-color: var(--color-blanco);
+    max-width: 880px;
+    background: var(--color-blanco);
     padding: 40px;
     border-radius: 30px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.08);
     box-sizing: border-box;
 }
 
-/* Encabezado */
+/* ==================== HEADER / LOGO ==================== */
 header {
     text-align: center;
     margin-bottom: 40px;
-    transition: transform 0.2s;
+    padding-bottom: 30px;
+    border-bottom: 2px solid var(--color-principal-suave);
+    position: relative;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 4px;
 }
 
 .logo-icono {
-    font-size: 50px;
-    margin: 0;
-    line-height: 1;
+    font-size: 38px;
+    background: linear-gradient(135deg, #DBEAFE, #EFF6FF);
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18);
+    flex-shrink: 0;
+    border: 2px solid rgba(37, 99, 235, 0.12);
+}
+
+.logo-texto {
+    text-align: left;
 }
 
 .titulo-principal {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 900;
     color: var(--color-principal);
-    margin: 10px 0 5px 0;
+    margin: 0;
     letter-spacing: -1px;
+    line-height: 1;
+}
+
+.titulo-accent {
+    color: #1E3A8A;
 }
 
 .subtitulo-principal {
-    font-size: 16px;
+    font-size: 14px;
     color: var(--color-texto-claro);
-    margin: 0;
+    margin: 4px 0 0;
+    font-weight: 600;
+    letter-spacing: 0.3px;
 }
 
-/* Pantallas */
+.version {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 11px;
+    color: #b4c6dd;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ==================== SCREENS ==================== */
 .pantalla {
     display: none;
-    animation: flotar 0.4s ease-out;
+    animation: slideUp 0.35s ease-out;
 }
 
 .pantalla.activa {
     display: block;
 }
 
-.version {
-    
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes flotar {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- TARJETAS DE INICIO Y MENÚ --- */
+/* ==================== CARDS DE INICIO ==================== */
 .contenedor-portal {
     display: flex;
     gap: 20px;
@@ -102,349 +139,863 @@ header {
 }
 
 .tarjeta-inicio {
-    background-color: var(--color-fondo);
-    border-radius: 25px;
-    padding: 30px;
+    background: var(--color-fondo-card);
+    border-radius: 24px;
+    padding: 32px 28px;
     text-align: center;
     flex: 1;
-    min-width: 250px;
-    border: 2px solid transparent;
+    min-width: 240px;
+    border: 2px solid var(--color-borde);
     transition: all 0.3s ease;
 }
 
 .tarjeta-inicio:hover {
-    background-color: var(--color-blanco);
+    background: var(--color-blanco);
     border-color: var(--color-principal);
     box-shadow: var(--sombra-suave);
     transform: translateY(-5px);
 }
 
+.tarjeta-emoji {
+    font-size: 42px;
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
 .tarjeta-inicio h2 {
-    margin: 0 0 10px 0;
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: var(--color-texto-oscuro);
 }
 
 .tarjeta-inicio p {
     color: var(--color-texto-claro);
     font-size: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    line-height: 1.5;
 }
 
-/* --- BOTONES GLOBALES --- */
+/* ==================== BOTONES ==================== */
 .btn {
-    background-color: var(--color-principal);
+    background: var(--color-principal);
     color: var(--color-blanco);
     border: none;
     padding: 14px 24px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
     border-radius: 50px;
     cursor: pointer;
     width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    font-family: inherit;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
 }
 
 .btn:hover {
-    background-color: var(--color-principal-hover);
+    background: var(--color-principal-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 .btn-secundario {
-    background-color: #E5E7EB;
+    background: #E2E8F0;
     color: var(--color-texto-oscuro);
     box-shadow: none;
 }
 
 .btn-secundario:hover {
-    background-color: #D1D5DB;
+    background: #CBD5E1;
+    box-shadow: none;
+    transform: translateY(-2px);
 }
 
 .btn-verde {
-    background-color: var(--color-secundario);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    background: var(--color-secundario);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
 }
 
 .btn-verde:hover {
-    background-color: #059669;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    background: var(--color-secundario-hover);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.38);
 }
 
 .btn-gris {
-    background-color: #9CA3AF;
+    background: #94A3B8;
     box-shadow: none;
 }
 
 .btn-gris:hover {
-    background-color: #6B7280;
+    background: #64748B;
     transform: none;
+    box-shadow: none;
 }
 
 .btn-rojo-chico {
-    background-color: #EF4444;
+    background: #EF4444;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 50px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 700;
+    font-family: inherit;
+    font-size: 14px;
     transition: all 0.2s;
 }
 
 .btn-rojo-chico:hover {
-    background-color: #DC2626;
+    background: #DC2626;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* --- CABECERAS INTERNAS --- */
+.btn-cancelar-link {
+    background: #b89494;
+    border: none;
+    color: var(--color-blanco);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    width: 50%;
+    text-decoration: underline;
+    padding: 14px 24px;
+    border-radius: 50px;
+    transition: all 0.2s;
+}
+
+.btn-cancelar-link:hover {
+    background: #ef4444;
+}
+
+/* ==================== CABECERA INTERNA ==================== */
 .cabecera-reserva {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 32px;
 }
 
 .ruta-badge {
     display: inline-block;
-    background-color: #DBEAFE;
+    background: var(--color-principal-suave);
     color: var(--color-principal);
-    padding: 6px 15px;
+    padding: 6px 16px;
     border-radius: 50px;
     font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
 }
 
 .cabecera-reserva h2 {
     margin: 0;
     font-size: 26px;
+    font-weight: 900;
+    color: var(--color-texto-oscuro);
 }
 
-/* --- TARJETAS DE AVATARES (ESPECIALIDADES Y MÉDICOS) --- */
+/* ==================== GRILLA DE AVATARES ==================== */
 .grilla-avatares {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 18px;
 }
 
 .tarjeta-avatar {
-    background-color: var(--color-blanco);
-    border: 2px solid #E5E7EB;
-    border-radius: 20px;
-    padding: 20px;
+    background: var(--color-blanco);
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 22px 16px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .tarjeta-avatar:hover {
     border-color: var(--color-principal);
     box-shadow: var(--sombra-hover);
-    transform: translateY(-8px);
+    transform: translateY(-6px);
 }
 
 .circulo-imagen {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 15px auto;
-    background-color: #F3F4F6;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 14px;
+    background: var(--color-fondo-card);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
-    /* Tamaño del Emoji */
-    border: 3px solid #DBEAFE;
+    font-size: 38px;
+    border: 3px solid var(--color-principal-suave);
 }
 
 .tarjeta-avatar span {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.3;
 }
 
-/* --- CALENDARIO PACIENTE --- */
+/* ==================== CALENDARIO ==================== */
 .calendario {
-    background-color: var(--color-fondo);
-    padding: 30px;
-    border-radius: 25px;
-    max-width: 600px;
+    background: var(--color-fondo-card);
+    padding: 28px;
+    border-radius: 24px;
+    max-width: 560px;
     margin: 0 auto;
+    border: 1px solid var(--color-borde);
+}
+
+.calendario-titulo {
+    text-align: center;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--color-principal);
+    margin-bottom: 20px;
 }
 
 .dias-semana,
 .dias-numeros {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 6px;
     text-align: center;
 }
 
 .dias-semana {
-    font-weight: bold;
+    font-weight: 700;
     color: var(--color-texto-claro);
     margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .celda-dia {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 45px;
-    border-radius: 12px;
-    font-size: 15px;
+    height: 42px;
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: 700;
-    color: #9CA3AF;
+    color: #C0CCDA;
 }
 
 .celda-dia.disponible {
-    background-color: var(--color-blanco);
+    background: var(--color-blanco);
     color: var(--color-texto-oscuro);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.celda-dia.disponible:hover {
+    background: var(--color-principal);
+    color: var(--color-blanco);
+    transform: scale(1.08);
+    border-color: var(--color-principal);
+}
+
+.celda-dia.seleccionada {
+    background: var(--color-principal) !important;
+    color: white !important;
+    border-color: var(--color-principal) !important;
+    transform: scale(1.08);
+}
+
+/* ==================== GRILLA DE HORAS ==================== */
+.grilla-horas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.btn-hora {
+    background: var(--color-blanco);
+    color: var(--color-texto-oscuro);
+    border: 2px solid var(--color-borde);
+    border-radius: 14px;
+    padding: 14px 8px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.celda-dia.disponible:hover {
-    background-color: var(--color-principal);
-    color: var(--color-blanco);
-    transform: scale(1.1);
+.btn-hora:hover {
+    border-color: var(--color-principal);
+    color: var(--color-principal);
+    background: #EFF6FF;
 }
 
-/* --- FORMULARIOS GLOBALES --- */
+.btn-hora.seleccionada-hora {
+    background: var(--color-principal);
+    border-color: var(--color-principal);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.hora-ocupada {
+    background: #FEF2F2 !important;
+    color: #FCA5A5 !important;
+    border-color: #FECACA !important;
+    cursor: not-allowed !important;
+}
+
+.fecha-seleccionada-label {
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--color-principal);
+}
+
+.link-cambiar {
+    color: var(--color-texto-claro);
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* ==================== FORMULARIOS ==================== */
 .formulario {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
     max-width: 600px;
     margin: 0 auto;
 }
+
+.grupo-input { width: 100%; }
 
 .grupo-input label {
     display: block;
     font-weight: 700;
     margin-bottom: 8px;
     font-size: 14px;
+    color: var(--color-texto-oscuro);
 }
 
 .campo-texto {
     width: 100%;
-    padding: 15px 20px;
-    border: 2px solid #E5E7EB;
-    border-radius: 15px;
-    font-size: 16px;
+    padding: 14px 18px;
+    border: 2px solid var(--color-borde);
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: inherit;
     box-sizing: border-box;
     outline: none;
-    transition: border-color 0.3s;
-    font-family: inherit;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    background: var(--color-blanco);
+    color: var(--color-texto-oscuro);
 }
 
 .campo-texto:focus {
     border-color: var(--color-principal);
-    box-shadow: 0 0 0 4px #DBEAFE;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
 }
 
-/* --- COMPONENTES SECRETARÍA --- */
 .fila-inputs {
     display: flex;
-    gap: 15px;
+    gap: 14px;
 }
 
-.fila-inputs>div {
-    flex: 1;
+.fila-inputs > div { flex: 1; }
+
+/* ==================== RESUMEN DE TURNO ==================== */
+.resumen-turno {
+    background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+    border: 2px dashed #34D399;
+    border-radius: 18px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
 }
 
-.hora-ocupada {
-    background-color: #FEE2E2 !important;
-    color: #EF4444 !important;
-    border: 2px solid #FECACA !important;
-    cursor: not-allowed !important;
-    box-shadow: none !important;
+.resumen-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
+.resumen-item > .resumen-emoji { font-size: 22px; }
+
+.resumen-item small {
+    display: block;
+    font-size: 11px;
+    color: #065F46;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.resumen-item strong {
+    font-size: 14px;
+    color: #064E3B;
+    font-weight: 700;
+}
+
+/* ==================== CHECKBOX ==================== */
 .checkbox-amigable {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 15px;
-    background-color: #F3F4F6;
-    border-radius: 15px;
-    font-weight: bold;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--color-fondo-card);
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid var(--color-borde);
+}
+
+.checkbox-amigable input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-principal);
     cursor: pointer;
 }
 
-/* Lista de Agenda */
-.lista-agenda {
+/* ==================== NAVEGACIÓN INFERIOR ==================== */
+.nav-inferior {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 12px;
+    margin-top: 8px;
 }
 
-.badge-dia {
-    background-color: #DBEAFE;
+.nav-inferior .btn {
+    flex: 1;
+}
+
+/* ==================== CONFIRMACIÓN ==================== */
+.confirmacion-wrapper {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.confirmacion-icono-grande {
+    font-size: 70px;
+    line-height: 1;
+    margin-bottom: 14px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+.confirmacion-titulo {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--color-texto-oscuro);
+    margin-bottom: 8px;
+}
+
+.conf-numero-op {
+    display: inline-block;
+    background: var(--color-principal-suave);
     color: var(--color-principal);
-    padding: 8px 15px;
-    border-radius: 12px;
-    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 50px;
     font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.conf-numero-op strong {
+    font-size: 16px;
+}
+
+.confirmacion-detalle {
+    background: var(--color-fondo-card);
+    border: 1px solid var(--color-borde);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.conf-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-borde);
+    gap: 10px;
+}
+
+.conf-fila:last-child { border-bottom: none; }
+
+.conf-label {
+    font-size: 13px;
+    color: var(--color-texto-claro);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.conf-valor {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+    text-align: right;
+}
+
+/* ==================== SECCIONES SECRETARÍA ==================== */
+.sec-seccion {
+    background: var(--color-fondo-card);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 22px;
+}
+
+.sec-seccion-titulo {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--color-principal);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--color-principal-suave);
+}
+
+/* ==================== SUBSECCIÓN CREAR PACIENTE / PROFESIONAL ==================== */
+.subseccion-crear {
+    background: #FFFBEB;
+    border: 2px dashed #FCD34D;
+    border-radius: var(--radio);
+    padding: 22px;
+    margin-top: 14px;
+}
+
+.subseccion-titulo {
+    font-size: 14px;
+    font-weight: 900;
+    color: #92400E;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #FDE68A;
+}
+
+/* ==================== PACIENTE ENCONTRADO / NO ENCONTRADO ==================== */
+.paciente-encontrado {
     display: flex;
     align-items: center;
     gap: 10px;
+    background: #ECFDF5;
+    border: 2px solid #6EE7B7;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    flex-wrap: wrap;
 }
 
-/* =========================================================================
-           MEDIA QUERIES - MEJORAS DE RESPONSIVIDAD PARA CELULARES Y MAYORES
-           ========================================================================= */
-@media (max-width: 600px) {
+.paciente-encontrado span { color: #065F46; font-size: 13px; font-weight: 600; }
+.paciente-encontrado strong { color: #064E3B; font-size: 15px; }
+
+.paciente-no-encontrado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #FEF2F2;
+    border: 2px solid #FECACA;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.paciente-no-encontrado span { color: #991B1B; font-size: 13px; font-weight: 700; }
+
+.btn-sm {
+    background: var(--color-principal);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.btn-sm:hover { background: var(--color-principal-hover); }
+
+.msg-error {
+    color: #EF4444;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* ==================== TABLA DE TURNOS ==================== */
+.tabla-turnos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.fila-turno {
+    background: var(--color-fondo-card);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 18px;
+    transition: border-color 0.2s;
+}
+
+.fila-turno:hover { border-color: #BFDBFE; }
+
+.turno-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.turno-fecha {
+    font-weight: 900;
+    font-size: 15px;
+    color: var(--color-texto-oscuro);
+}
+
+.turno-medico, .turno-esp {
+    font-size: 13px;
+    color: var(--color-texto-claro);
+    font-weight: 700;
+}
+
+.turno-acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.badge-estado {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: auto;
+}
+
+.estado-confirmado { background: #D1FAE5; color: #065F46; }
+.estado-cancelado  { background: #FEE2E2; color: #991B1B; }
+.estado-modificado { background: #FEF3C7; color: #92400E; }
+
+.btn-accion {
+    background: none;
+    border: 2px solid var(--color-borde);
+    border-radius: 50px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modificar {
+    color: var(--color-principal);
+    border-color: #BFDBFE;
+}
+
+.btn-modificar:hover {
+    background: var(--color-principal);
+    color: white;
+    border-color: var(--color-principal);
+}
+
+.btn-cancelar-turno {
+    color: #EF4444;
+    border-color: #FECACA;
+}
+
+.btn-cancelar-turno:hover {
+    background: #EF4444;
+    color: white;
+    border-color: #EF4444;
+}
+
+/* ==================== FORMULARIO DE MODIFICACIÓN ==================== */
+.form-modificacion {
+    margin-top: 16px;
+    padding: 18px;
+    background: white;
+    border: 2px dashed #BFDBFE;
+    border-radius: var(--radio);
+}
+
+/* ==================== CARDS DE PROFESIONALES (ADMIN) ==================== */
+.card-profesional {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--color-fondo-card);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 18px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+.card-profesional:hover {
+    border-color: #BFDBFE;
+    box-shadow: var(--sombra-suave);
+}
+
+.prof-avatar {
+    font-size: 36px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-principal-suave);
+    border-radius: 14px;
+    flex-shrink: 0;
+}
+
+.prof-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.prof-info strong {
+    font-size: 16px;
+    color: var(--color-texto-oscuro);
+}
+
+.prof-info span {
+    font-size: 13px;
+    color: var(--color-texto-claro);
+    font-weight: 600;
+}
+
+.prof-acciones {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+/* ==================== AGENDA DÍAS ==================== */
+.lista-agenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    min-height: 40px;
+}
+
+.badge-dia {
+    background: var(--color-principal-suave);
+    color: var(--color-principal);
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-dia button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #93C5FD;
+    font-size: 12px;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.badge-dia button:hover { color: #EF4444; }
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
     body {
-        padding: 10px;
-        /* Recuperamos espacio en los bordes de la pantalla */
+        background: white;
+        padding: 0;
+        display: block;
     }
 
     #app {
-        padding: 30px 20px;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 30px;
+        max-width: 100%;
+    }
+
+    .pantalla {
+        display: none !important;
+    }
+
+    #pantalla-confirmacion {
+        display: block !important;
+    }
+
+    .nav-inferior,
+    header .version {
+        display: none !important;
+    }
+
+    .confirmacion-wrapper {
+        box-shadow: none;
+    }
+
+    .confirmacion-detalle {
+        border: 1px solid #ccc;
+    }
+
+    header {
+        border-bottom: 2px solid #ccc;
+        margin-bottom: 20px;
+    }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 600px) {
+    body { padding: 8px; }
+
+    #app {
+        padding: 24px 16px;
         border-radius: 20px;
     }
 
-    /* Textos más grandes para mayor legibilidad */
-    .titulo-principal {
-        font-size: 28px;
-    }
+    .logo-icono { width: 52px; height: 52px; font-size: 28px; border-radius: 14px; }
+    .titulo-principal { font-size: 26px; }
+    .subtitulo-principal { font-size: 12px; }
 
-    .cabecera-reserva h2 {
-        font-size: 22px;
-    }
+    .cabecera-reserva h2 { font-size: 21px; }
 
-    .ruta-badge {
-        font-size: 14px;
-        padding: 8px 18px;
-    }
+    .btn { padding: 16px 20px; font-size: 17px; }
+    .campo-texto { padding: 14px 16px; font-size: 16px; }
 
-    /* Botones y campos de texto con áreas táctiles más amplias (Accesibilidad) */
-    .btn {
-        padding: 16px 20px;
-        font-size: 18px;
-    }
+    .tarjeta-inicio { padding: 24px 18px; }
 
-    .campo-texto {
-        padding: 15px 18px;
-        font-size: 18px;
-    }
-
-    .grupo-input label {
-        font-size: 16px;
-    }
-
-    /* Tarjetas del menú a todo el ancho */
-    .tarjeta-inicio {
-        padding: 25px 20px;
-    }
-
-    /* Listas de especialidades y doctores: 
-               Pasan de grilla a lista en fila (como contactos) para que los botones sean anchos */
     .grilla-avatares {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 12px;
     }
 
     .tarjeta-avatar {
@@ -452,51 +1003,43 @@ header {
         flex-direction: row;
         align-items: center;
         text-align: left;
-        padding: 15px 20px;
-        gap: 20px;
+        padding: 14px 18px;
+        gap: 16px;
     }
 
     .circulo-imagen {
         margin: 0;
-        width: 60px;
-        height: 60px;
-        font-size: 30px;
+        width: 54px;
+        height: 54px;
+        font-size: 28px;
         flex-shrink: 0;
     }
 
-    .tarjeta-avatar span {
-        font-size: 18px;
-    }
+    .tarjeta-avatar span { font-size: 16px; }
 
-    /* Horarios: Forzamos 2 columnas para que los botones de hora sean gigantes y fáciles de tocar */
-    #contenedor-horarios,
-    #grilla-horarios-rapida {
+    .grilla-horas,
+    #sec-grilla-horarios {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 15px !important;
+        gap: 10px !important;
     }
 
-    /* Calendario más cómodo para uso táctil */
-    .calendario {
-        padding: 20px 10px;
-    }
+    .calendario { padding: 16px 10px; }
+    .celda-dia { height: 46px; font-size: 14px; }
+    .dias-semana { font-size: 12px; }
 
-    .celda-dia {
-        height: 50px;
-        font-size: 16px;
-    }
+    .fila-inputs { flex-direction: column; gap: 16px; }
 
-    .dias-semana {
-        font-size: 15px;
-    }
+    .resumen-turno { grid-template-columns: 1fr; }
 
-    /* Formularios apilados */
-    .fila-inputs {
-        flex-direction: column;
-        gap: 20px;
-    }
+    .turno-info { flex-direction: column; align-items: flex-start; }
 
-    .checkbox-amigable {
-        font-size: 14px;
-        padding: 15px 10px;
-    }
+    .card-profesional { flex-direction: column; text-align: center; }
+    .prof-acciones { flex-direction: row; justify-content: center; }
+
+    .nav-inferior { flex-direction: column-reverse; }
+
+    .conf-fila { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .conf-valor { text-align: left; }
+
+    .contenedor-portal { gap: 14px; }
 }
