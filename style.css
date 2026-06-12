@@ -110,7 +110,7 @@ header {
     top: 0;
     right: 0;
     font-size: 11px;
-    color: #b4c6dd;
+    color: #CBD5E1;
     font-weight: 700;
     letter-spacing: 0.5px;
 }
@@ -253,23 +253,22 @@ header {
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
+/* Botón cancelar tipo link */
 .btn-cancelar-link {
-    background: #b89494;
+    background: none;
     border: none;
-    color: var(--color-blanco);
+    color: #94A3B8;
     font-size: 13px;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
-    width: 50%;
     text-decoration: underline;
-    padding: 14px 24px;
-    border-radius: 50px;
-    transition: all 0.2s;
+    padding: 4px 8px;
+    transition: color 0.2s;
 }
 
 .btn-cancelar-link:hover {
-    background: #ef4444;
+    color: #EF4444;
 }
 
 /* ==================== CABECERA INTERNA ==================== */
@@ -930,6 +929,134 @@ header {
 }
 
 .badge-dia button:hover { color: #EF4444; }
+
+/* ==================== CALENDARIO MULTISELECT ==================== */
+.calendario-multiselect {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    background: white;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--color-borde);
+}
+
+.dia-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border: 2px solid var(--color-borde);
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--color-texto-oscuro);
+    transition: all 0.2s;
+    position: relative;
+}
+
+.dia-checkbox:hover {
+    border-color: var(--color-principal);
+    background: #EFF6FF;
+}
+
+.dia-checkbox.seleccionado {
+    background: var(--color-principal);
+    color: white;
+    border-color: var(--color-principal);
+}
+
+.dia-checkbox.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #F3F4F6;
+}
+
+.dia-checkbox input {
+    display: none;
+}
+
+/* ==================== GRILLA HORARIOS CHECKBOX ==================== */
+.grilla-horarios-checkbox {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+}
+
+.horario-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: white;
+    border: 2px solid var(--color-borde);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.horario-checkbox:hover {
+    border-color: var(--color-principal);
+    background: #EFF6FF;
+}
+
+.horario-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-principal);
+    cursor: pointer;
+}
+
+.horario-checkbox input:checked + label {
+    color: var(--color-principal);
+}
+
+.horario-checkbox input:checked ~ * {
+    color: var(--color-principal);
+}
+
+.horario-checkbox.seleccionado {
+    background: var(--color-principal-suave);
+    border-color: var(--color-principal);
+}
+
+/* ==================== LISTA HORARIOS AGENDA ==================== */
+.lista-horarios-agenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    min-height: 40px;
+}
+
+.badge-horario {
+    background: #DDD6FE;
+    color: #4F46E5;
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-horario button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #A5B4FC;
+    font-size: 12px;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.badge-horario button:hover { color: #EF4444; }
 
 /* ==================== PRINT STYLES ==================== */
 @media print {

@@ -441,30 +441,58 @@
         <div id="pantalla-agenda" class="pantalla">
             <div class="cabecera-reserva">
                 <span class="ruta-badge">Secretaría › Agenda</span>
-                <h2>Configurar Días de Atención</h2>
+                <h2>Configurar Disponibilidad del Profesional</h2>
             </div>
-            <div class="formulario" style="max-width:650px;">
-                <div class="fila-inputs">
-                    <div class="grupo-input">
-                        <label>Seleccionar Profesional</label>
-                        <select class="campo-texto" id="agenda-profesional" onchange="renderizarDiasAgenda()"></select>
+            <div class="formulario" style="max-width:700px;">
+                
+                <!-- Seleccionar Profesional -->
+                <div class="grupo-input">
+                    <label>Seleccionar Profesional</label>
+                    <select class="campo-texto" id="agenda-profesional" onchange="inicializarConfigAgenda()"></select>
+                </div>
+
+                <!-- DÍAS DISPONIBLES -->
+                <div id="agenda-dias-seccion" style="display:none;" class="sec-seccion">
+                    <div class="sec-seccion-titulo">📅 Seleccionar Días (Julio 2026)</div>
+                    <p style="font-size:13px;color:var(--color-texto-claro);margin:0 0 14px;">Marcá los días que atiende este profesional:</p>
+                    <div class="calendario-multiselect" id="calendario-multiselect"></div>
+                    <div class="nav-inferior" style="margin-top:14px;">
+                        <button class="btn btn-secundario" onclick="limpiarSeleccionDias()">Limpiar selección</button>
+                        <button class="btn btn-verde" onclick="guardarDiasSeleccionados()">✓ Guardar Días</button>
                     </div>
-                    <div class="grupo-input">
-                        <label>Agregar Día (Julio 2026)</label>
-                        <div style="display:flex;gap:10px;">
-                            <input class="campo-texto" type="date" id="agenda-fecha" min="2026-07-01" max="2026-07-31">
-                            <button class="btn btn-verde" style="width:auto;padding:0 20px;" onclick="agregarDiaAgenda()">➕</button>
+                </div>
+
+                <!-- HORARIOS DISPONIBLES -->
+                <div id="agenda-horarios-seccion" style="display:none;" class="sec-seccion">
+                    <div class="sec-seccion-titulo">🕐 Horarios Disponibles</div>
+                    <p style="font-size:13px;color:var(--color-texto-claro);margin:0 0 14px;">Seleccioná los horarios en los que atiende:</p>
+                    <div class="grilla-horarios-checkbox" id="grilla-horarios-checkbox"></div>
+                    <div class="nav-inferior" style="margin-top:14px;">
+                        <button class="btn btn-secundario" onclick="limpiarSeleccionHorarios()">Limpiar horarios</button>
+                        <button class="btn btn-verde" onclick="guardarHorariosSeleccionados()">✓ Guardar Horarios</button>
+                    </div>
+                </div>
+
+                <!-- RESUMEN -->
+                <div id="agenda-resumen-seccion" style="display:none;" class="sec-seccion">
+                    <div class="sec-seccion-titulo">📋 Configuración Actual</div>
+                    <div style="display:grid;gap:16px;">
+                        <div>
+                            <label style="color:var(--color-principal);margin-bottom:6px;display:block;font-weight:700;">Días Asignados:</label>
+                            <div class="lista-agenda" id="contenedor-dias-agenda">
+                                <p style="color:#9CA3AF;">Sin días asignados</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="color:var(--color-principal);margin-bottom:6px;display:block;font-weight:700;">Horarios Asignados:</label>
+                            <div class="lista-horarios-agenda" id="contenedor-horarios-agenda">
+                                <p style="color:#9CA3AF;">Sin horarios asignados</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="grupo-input" style="background:#F0F6FF;padding:20px;border-radius:15px;border:1px solid #DBEAFE;">
-                    <label style="color:var(--color-principal);margin-bottom:6px;display:block;">📋 Días Asignados</label>
-                    <p style="font-size:13px;color:var(--color-texto-claro);margin:0 0 12px;">Los pacientes solo verán estos días en el calendario.</p>
-                    <div class="lista-agenda" id="contenedor-dias-agenda">
-                        <p style="color:#9CA3AF;">Seleccione un médico arriba.</p>
-                    </div>
-                </div>
-                <div style="text-align:center;margin-top:5px;">
+
+                <div style="text-align:center;margin-top:15px;border-top:1px solid #E5E7EB;padding-top:15px;">
                     <button class="btn btn-gris" style="width:auto;" onclick="irA('secretaria-menu')">← Volver al Menú</button>
                 </div>
             </div>
@@ -517,13 +545,7 @@
                             <input class="campo-texto" type="email" id="nuevo-prof-mail" placeholder="email@clinic.com">
                         </div>
                     </div>
-                    <div class="grupo-input" style="max-width:200px;">
-                        <label>Género</label>
-                        <select class="campo-texto" id="nuevo-prof-genero">
-                            <option value="M">Masculino (Dr.)</option>
-                            <option value="F">Femenino (Dra.)</option>
-                        </select>
-                    </div>
+
                     <div class="nav-inferior" style="margin-top:5px;">
                         <button class="btn btn-gris" onclick="toggleFormAgregarProfesional()">Cancelar</button>
                         <button class="btn btn-verde" onclick="guardarNuevoProfesional()">✅ Guardar Profesional</button>

@@ -27,12 +27,12 @@ const obrasSociales = [
 
 // Profesionales con especialidad asignada
 let profesionalesBD = [
-    { id: 1, nombre: "Martín",  apellido: "Abad",       dni: "20111222", especialidad: "Cardiología",  celular: "2614111222", mail: "m.abad@clinic.com",       genero: "M" },
-    { id: 2, nombre: "Sofía",   apellido: "Castro",      dni: "27333444", especialidad: "Dermatología", celular: "2614333444", mail: "s.castro@clinic.com",     genero: "F" },
-    { id: 3, nombre: "Julián",  apellido: "Domínguez",  dni: "28555666", especialidad: "Kinesiología", celular: "2614555666", mail: "j.dominguez@clinic.com",   genero: "M" },
-    { id: 4, nombre: "Laura",   apellido: "Giménez",    dni: "31777888", especialidad: "Nutrición",    celular: "2614777888", mail: "l.gimenez@clinic.com",     genero: "F" },
-    { id: 5, nombre: "Carlos",  apellido: "Fernández",  dni: "22999000", especialidad: "Odontología",  celular: "2614999000", mail: "c.fernandez@clinic.com",   genero: "M" },
-    { id: 6, nombre: "Ana",     apellido: "López",       dni: "29123123", especialidad: "Pediatría",    celular: "2614123123", mail: "a.lopez@clinic.com",       genero: "F" }
+    { id: 1, nombre: "Martín",  apellido: "Abad",       dni: "20111222", especialidad: "Cardiología",  celular: "2614111222", mail: "m.abad@clinic.com" },
+    { id: 2, nombre: "Sofía",   apellido: "Castro",      dni: "27333444", especialidad: "Dermatología", celular: "2614333444", mail: "s.castro@clinic.com" },
+    { id: 3, nombre: "Julián",  apellido: "Domínguez",  dni: "28555666", especialidad: "Kinesiología", celular: "2614555666", mail: "j.dominguez@clinic.com" },
+    { id: 4, nombre: "Laura",   apellido: "Giménez",    dni: "31777888", especialidad: "Nutrición",    celular: "2614777888", mail: "l.gimenez@clinic.com" },
+    { id: 5, nombre: "Carlos",  apellido: "Fernández",  dni: "22999000", especialidad: "Odontología",  celular: "2614999000", mail: "c.fernandez@clinic.com" },
+    { id: 6, nombre: "Ana",     apellido: "López",       dni: "29123123", especialidad: "Pediatría",    celular: "2614123123", mail: "a.lopez@clinic.com" }
 ];
 
 // Pacientes registrados
@@ -60,6 +60,20 @@ let agendaProfesionales = {
     "Carlos Fernández": ["2026-07-10", "2026-07-17", "2026-07-24"],
     "Ana López":      ["2026-07-06", "2026-07-13", "2026-07-20"]
 };
+
+// Horarios disponibles por profesional
+let horariosProfesionales = {
+    "Martín Abad":    ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"],
+    "Sofía Castro":   ["09:00", "10:00", "11:00", "16:00", "16:30"],
+    "Julián Domínguez": ["09:00", "09:30", "10:00", "10:30", "11:00", "16:00", "16:30"],
+    "Laura Giménez":  ["09:00", "10:00", "11:00"],
+    "Carlos Fernández": ["09:30", "10:30", "16:00", "16:30"],
+    "Ana López":      ["10:00", "11:00", "16:00"]
+};
+
+// Estado de multiselección en configurar agenda
+let seleccionDiasTemp = [];
+let seleccionHorariosTemp = [];
 
 // Contadores de IDs
 let _contadorTurnos = 1002;
@@ -183,12 +197,10 @@ function elegirEspecialidad(nombre) {
             No hay profesionales disponibles para esta especialidad.</p>`;
     } else {
         filtrados.forEach(prof => {
-            const icono = prof.genero === "M" ? "👨‍⚕️" : "👩‍⚕️";
-            const titulo = prof.genero === "M" ? "Dr." : "Dra.";
             c.innerHTML += `
                 <div class="tarjeta-avatar" onclick="elegirProfesional(${prof.id})">
-                    <div class="circulo-imagen">${icono}</div>
-                    <span>${titulo} ${prof.nombre} ${prof.apellido}</span>
+                    <div class="circulo-imagen">👨‍⚕️</div>
+                    <span>${prof.nombre} ${prof.apellido}</span>
                 </div>`;
         });
     }
@@ -479,8 +491,7 @@ function actualizarProfesionalesSecretaria() {
     profesionalesBD
         .filter(p => p.especialidad === especialidad)
         .forEach(prof => {
-            const titulo = prof.genero === "M" ? "Dr." : "Dra.";
-            selProf.innerHTML += `<option value="${nombreCompleto(prof)}">${titulo} ${prof.nombre} ${prof.apellido}</option>`;
+            selProf.innerHTML += `<option value="${nombreCompleto(prof)}">${prof.nombre} ${prof.apellido}</option>`;
         });
 }
 
@@ -707,52 +718,183 @@ function abrirConfiguracionAgenda() {
     profesionalesBD.forEach(prof => {
         sel.innerHTML += `<option value="${nombreCompleto(prof)}">${prof.nombre} ${prof.apellido} · ${prof.especialidad}</option>`;
     });
-    document.getElementById("contenedor-dias-agenda").innerHTML = `<p style="color:#9CA3AF;">Seleccione un médico arriba.</p>`;
+    document.getElementById("agenda-dias-seccion").style.display = "none";
+    document.getElementById("agenda-horarios-seccion").style.display = "none";
+    document.getElementById("agenda-resumen-seccion").style.display = "none";
     irA("agenda");
 }
 
-function renderizarDiasAgenda() {
+function inicializarConfigAgenda() {
     const profesional = document.getElementById("agenda-profesional").value;
-    const c = document.getElementById("contenedor-dias-agenda");
-
+    
     if (!profesional) {
-        c.innerHTML = `<p style="color:#9CA3AF;">Seleccione un médico arriba.</p>`;
+        document.getElementById("agenda-dias-seccion").style.display = "none";
+        document.getElementById("agenda-horarios-seccion").style.display = "none";
+        document.getElementById("agenda-resumen-seccion").style.display = "none";
         return;
     }
-    const fechas = agendaProfesionales[profesional] || [];
-    if (fechas.length === 0) {
-        c.innerHTML = `<p style="color:#EF4444;font-weight:700;">No hay días asignados. El médico no aparecerá en el calendario.</p>`;
-        return;
+
+    // Reset selections
+    seleccionDiasTemp = [...(agendaProfesionales[profesional] || [])];
+    seleccionHorariosTemp = [...(horariosProfesionales[profesional] || [])];
+
+    // Show sections
+    document.getElementById("agenda-dias-seccion").style.display = "block";
+    document.getElementById("agenda-horarios-seccion").style.display = "block";
+    document.getElementById("agenda-resumen-seccion").style.display = "block";
+
+    // Render calendar and time slots
+    renderizarCalendarioMultiselect();
+    renderizarGrillaHorariosCheckbox();
+    renderizarResumenAgenda();
+}
+
+function renderizarCalendarioMultiselect() {
+    const contenedor = document.getElementById("calendario-multiselect");
+    contenedor.innerHTML = "";
+
+    // Encabezados de días de la semana
+    ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].forEach(dia => {
+        const header = document.createElement("div");
+        header.style.fontWeight = "700";
+        header.style.textAlign = "center";
+        header.style.color = "var(--color-texto-claro)";
+        header.style.fontSize = "12px";
+        header.innerHTML = dia;
+        contenedor.appendChild(header);
+    });
+
+    // Espacios vacíos para alineación (Julio 2026 empieza miércoles)
+    for (let i = 0; i < 2; i++) {
+        const empty = document.createElement("div");
+        empty.style.background = "transparent";
+        contenedor.appendChild(empty);
     }
-    c.innerHTML = "";
-    [...fechas].sort().forEach(f => {
-        const dia = f.split("-")[2];
-        c.innerHTML += `
-            <div class="badge-dia">
-                ${dia}/07
-                <button onclick="eliminarDiaAgenda('${profesional}', '${f}')" title="Quitar día">✖</button>
-            </div>`;
+
+    // Días del mes
+    for (let d = 1; d <= 31; d++) {
+        const dd = d < 10 ? `0${d}` : `${d}`;
+        const fechaStr = `2026-07-${dd}`;
+        
+        const btn = document.createElement("button");
+        btn.className = "dia-checkbox";
+        if (seleccionDiasTemp.includes(fechaStr)) {
+            btn.classList.add("seleccionado");
+        }
+        btn.innerHTML = `<span>${d}</span>`;
+        btn.onclick = () => toggleDiaSeleccion(fechaStr, btn);
+        
+        contenedor.appendChild(btn);
+    }
+}
+
+function toggleDiaSeleccion(fechaStr, btn) {
+    const idx = seleccionDiasTemp.indexOf(fechaStr);
+    if (idx > -1) {
+        seleccionDiasTemp.splice(idx, 1);
+        btn.classList.remove("seleccionado");
+    } else {
+        seleccionDiasTemp.push(fechaStr);
+        btn.classList.add("seleccionado");
+    }
+}
+
+function limpiarSeleccionDias() {
+    seleccionDiasTemp = [];
+    renderizarCalendarioMultiselect();
+}
+
+function guardarDiasSeleccionados() {
+    const profesional = document.getElementById("agenda-profesional").value;
+    agendaProfesionales[profesional] = [...seleccionDiasTemp].sort();
+    renderizarResumenAgenda();
+}
+
+function renderizarGrillaHorariosCheckbox() {
+    const contenedor = document.getElementById("grilla-horarios-checkbox");
+    contenedor.innerHTML = "";
+
+    horariosBD.forEach(hora => {
+        const isSelected = seleccionHorariosTemp.includes(hora);
+        
+        const label = document.createElement("label");
+        label.className = "horario-checkbox" + (isSelected ? " seleccionado" : "");
+        label.innerHTML = `
+            <input type="checkbox" ${isSelected ? "checked" : ""} onchange="toggleHorarioSeleccion('${hora}')">
+            <span>${hora}</span>`;
+        
+        contenedor.appendChild(label);
     });
 }
 
-function agregarDiaAgenda() {
+function toggleHorarioSeleccion(hora) {
+    const idx = seleccionHorariosTemp.indexOf(hora);
+    if (idx > -1) {
+        seleccionHorariosTemp.splice(idx, 1);
+    } else {
+        seleccionHorariosTemp.push(hora);
+    }
+    renderizarGrillaHorariosCheckbox();
+}
+
+function limpiarSeleccionHorarios() {
+    seleccionHorariosTemp = [];
+    renderizarGrillaHorariosCheckbox();
+}
+
+function guardarHorariosSeleccionados() {
     const profesional = document.getElementById("agenda-profesional").value;
-    const fecha       = document.getElementById("agenda-fecha").value;
-    if (!profesional) { alert("Seleccione un profesional."); return; }
-    if (!fecha)       { alert("Seleccione una fecha."); return; }
+    horariosProfesionales[profesional] = [...seleccionHorariosTemp].sort();
+    renderizarResumenAgenda();
+}
 
-    if (!agendaProfesionales[profesional]) agendaProfesionales[profesional] = [];
-    if (agendaProfesionales[profesional].includes(fecha)) { alert("Ese día ya está asignado."); return; }
+function renderizarResumenAgenda() {
+    const profesional = document.getElementById("agenda-profesional").value;
+    
+    // Días
+    const diasC = document.getElementById("contenedor-dias-agenda");
+    const diasAsignados = agendaProfesionales[profesional] || [];
+    if (diasAsignados.length === 0) {
+        diasC.innerHTML = `<p style="color:#9CA3AF;">Sin días asignados</p>`;
+    } else {
+        diasC.innerHTML = "";
+        [...diasAsignados].sort().forEach(f => {
+            const dia = f.split("-")[2];
+            diasC.innerHTML += `
+                <div class="badge-dia">
+                    ${dia}/07
+                    <button onclick="eliminarDiaAgenda('${profesional}', '${f}')" title="Quitar día">✖</button>
+                </div>`;
+        });
+    }
 
-    agendaProfesionales[profesional].push(fecha);
-    document.getElementById("agenda-fecha").value = "";
-    renderizarDiasAgenda();
+    // Horarios
+    const horariosC = document.getElementById("contenedor-horarios-agenda");
+    const horariosAsignados = horariosProfesionales[profesional] || [];
+    if (horariosAsignados.length === 0) {
+        horariosC.innerHTML = `<p style="color:#9CA3AF;">Sin horarios asignados</p>`;
+    } else {
+        horariosC.innerHTML = "";
+        horariosAsignados.forEach(h => {
+            horariosC.innerHTML += `
+                <div class="badge-horario">
+                    ${h} hs.
+                    <button onclick="eliminarHorarioAgenda('${profesional}', '${h}')" title="Quitar horario">✖</button>
+                </div>`;
+        });
+    }
 }
 
 function eliminarDiaAgenda(profesional, fechaStr) {
     const idx = agendaProfesionales[profesional].indexOf(fechaStr);
     if (idx > -1) agendaProfesionales[profesional].splice(idx, 1);
-    renderizarDiasAgenda();
+    renderizarResumenAgenda();
+}
+
+function eliminarHorarioAgenda(profesional, hora) {
+    const idx = horariosProfesionales[profesional].indexOf(hora);
+    if (idx > -1) horariosProfesionales[profesional].splice(idx, 1);
+    renderizarResumenAgenda();
 }
 
 // ==========================================
@@ -773,13 +915,11 @@ function renderizarListaProfesionales() {
     }
     c.innerHTML = "";
     profesionalesBD.forEach(prof => {
-        const icono  = prof.genero === "M" ? "👨‍⚕️" : "👩‍⚕️";
-        const titulo = prof.genero === "M" ? "Dr." : "Dra.";
         c.innerHTML += `
             <div class="card-profesional">
-                <div class="prof-avatar">${icono}</div>
+                <div class="prof-avatar">👨‍⚕️</div>
                 <div class="prof-info">
-                    <strong>${titulo} ${prof.nombre} ${prof.apellido}</strong>
+                    <strong>${prof.nombre} ${prof.apellido}</strong>
                     <span>🔬 ${prof.especialidad}</span>
                     <span>📧 ${prof.mail}</span>
                     <span>📱 ${prof.celular}</span>
@@ -816,7 +956,6 @@ function guardarNuevoProfesional() {
     const especialidad = document.getElementById("nuevo-prof-especialidad").value;
     const celular     = document.getElementById("nuevo-prof-celular").value.trim();
     const mail        = document.getElementById("nuevo-prof-mail").value.trim();
-    const genero      = document.getElementById("nuevo-prof-genero").value;
 
     if (!nombre || !apellido || !dni || !celular || !mail) {
         alert("⚠️ Completá todos los campos obligatorios."); return;
@@ -825,7 +964,7 @@ function guardarNuevoProfesional() {
         alert("Ya existe un profesional con ese DNI."); return;
     }
 
-    const nuevo = { id: generarIdProfesional(), nombre, apellido, dni, especialidad, celular, mail, genero };
+    const nuevo = { id: generarIdProfesional(), nombre, apellido, dni, especialidad, celular, mail };
     profesionalesBD.push(nuevo);
 
     // Inicializar agenda vacía
@@ -833,18 +972,21 @@ function guardarNuevoProfesional() {
         agendaProfesionales[nombreCompleto(nuevo)] = [];
     }
 
+    // Inicializar horarios vacíos
+    if (!horariosProfesionales[nombreCompleto(nuevo)]) {
+        horariosProfesionales[nombreCompleto(nuevo)] = [];
+    }
+
     document.getElementById("form-agregar-profesional").style.display = "none";
     renderizarListaProfesionales();
 
-    const titulo = genero === "M" ? "Dr." : "Dra.";
-    alert(`✅ ${titulo} ${nombre} ${apellido} agregado/a exitosamente al sistema.`);
+    alert(`✅ ${nombre} ${apellido} agregado/a exitosamente al sistema.`);
 }
 
 function eliminarProfesional(id) {
     const prof = profesionalesBD.find(p => p.id === id);
     if (!prof) return;
-    const titulo = prof.genero === "M" ? "Dr." : "Dra.";
-    if (!confirm(`¿Eliminar a ${titulo} ${prof.nombre} ${prof.apellido}? Esta acción no se puede deshacer.`)) return;
+    if (!confirm(`¿Eliminar a ${prof.nombre} ${prof.apellido}? Esta acción no se puede deshacer.`)) return;
 
     profesionalesBD = profesionalesBD.filter(p => p.id !== id);
     renderizarListaProfesionales();
@@ -855,7 +997,7 @@ function editarAgendaDesdeProfesionales(nomProf) {
     abrirConfiguracionAgenda();
     const sel = document.getElementById("agenda-profesional");
     sel.value = nomProf;
-    renderizarDiasAgenda();
+    inicializarConfigAgenda();
 }
 
 // ==========================================
