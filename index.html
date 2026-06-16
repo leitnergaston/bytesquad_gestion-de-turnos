@@ -18,7 +18,7 @@
     </header>
     <!-- Versión del programa (editable por el usuario, mantenida para actualizaciones) -->
     <div style="position: absolute; right: 1rem; bottom: 1rem; max-width: 900px; padding: 0 1.5rem;">
-        <span class="version-programa" style="font-size: 0.8rem; color: var(--color-texto-secundario);">v14.06.26_2243</span>
+        <span class="version-programa" style="font-size: 0.8rem; color: var(--color-texto-secundario);">v16.06.26_1639</span>
     </div>
 
     <main class="container">
@@ -131,7 +131,10 @@
                 <p><strong>Profesional:</strong> <span id="conf-profesional"></span></p>
                 <p><strong>Fecha y Hora:</strong> <span id="conf-fecha"></span></p>
                 <p class="msg-recordatorio">Recibirá un recordatorio por email 24hs antes de su turno.</p>
-                <button id="btn-conf-aceptar" class="btn-primario">Aceptar</button>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                    <button onclick="window.print()" class="btn-secundario"><span style="margin-right: 0.5rem;">🖨️</span> Imprimir PDF</button>
+                    <button id="btn-conf-aceptar" class="btn-primario">Aceptar</button>
+                </div>
             </div>
         </div>
 
@@ -294,6 +297,7 @@
                 <p><strong>Turno ID:</strong> <span id="mod-turno-id"></span></p>
                 <p><strong>Paciente:</strong> <span id="mod-turno-paciente"></span></p>
                 <p><strong>Profesional:</strong> <span id="mod-turno-profesional"></span></p>
+                <p><strong>Fecha y Hora:</strong> <span id="mod-turno-fecha-hora"></span></p>
             </div>
             <div class="tarjeta-form">
                 <h4>Reprogramar Turno</h4>

@@ -124,6 +124,17 @@ async function startServer() {
             console.log("Nota al alterar la columna Turno.estado: ", alterErr.message);
           }
 
+          // Eliminar columna motivo_consulta si existe
+          const [turnoCols] = await connCheck.query("SHOW COLUMNS FROM Turno LIKE 'motivo_consulta'");
+          if (turnoCols.length > 0) {
+            console.log("Eliminando columna 'motivo_consulta' de Turno...");
+            try {
+              await connCheck.query("ALTER TABLE Turno DROP COLUMN motivo_consulta");
+            } catch (dropErr) {
+              console.log("Nota al eliminar motivo_consulta: ", dropErr.message);
+            }
+          }
+
           console.log("Auto-migración completada con éxito.");
         } catch (migrError) {
           console.error("Error ejecutando migración de base de datos:", migrError);
@@ -416,8 +427,8 @@ async function startServer() {
   app.get("/api/turnos", async (req, res) => {
     try {
       const query = `
-        SELECT t.id_turno, DATE_FORMAT(t.fecha, '%Y-%m-%d') AS fecha, TIME_FORMAT(t.hora, '%H:%i') AS hora, t.estado, t.motivo_consulta, t.id_paciente, t.id_profesional, t.id_obra_social,
-               p.nombre AS pac_nombre, p.apellido AS pac_apellido, p.dni AS pac_dni,
+        SELECT t.id_turno, DATE_FORMAT(t.fecha, '%Y-%m-%d') AS fecha, TIME_FORMAT(t.hora, '%H:%i') AS hora, t.estado, t.id_paciente, t.id_profesional, t.id_obra_social,
+               p.nombre AS pac_nombre, p.apellido AS pac_apellido, p.dni AS pac_dni, p.celular, p.email,
                prof.nombre AS prof_nombre, prof.apellido AS prof_apellido,
                e.nombre_especialidad,
                os.nombre AS obra_social_nombre
@@ -438,7 +449,7 @@ async function startServer() {
 
   app.post("/api/turnos", async (req, res) => {
     try {
-      const { fecha, hora, estado, motivo_consulta, id_paciente, id_profesional, id_obra_social } = req.body;
+      const { fecha, hora, estado, id_paciente, id_profesional, id_obra_social } = req.body;
       
       // Eliminar turno cancelado anterior en el mismo horario si existe para evitar violación de UNIQUE
       await db.query(
@@ -447,8 +458,8 @@ async function startServer() {
       );
 
       const [result] = await db.query(
-        "INSERT INTO Turno (fecha, hora, estado, motivo_consulta, id_paciente, id_profesional, id_obra_social) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [fecha, hora, estado || 'confirmado', motivo_consulta, id_paciente, id_profesional, id_obra_social]
+        "INSERT INTO Turno (fecha, hora, estado, id_paciente, id_profesional, id_obra_social) VALUES (?, ?, ?, ?, ?, ?)",
+        [fecha, hora, estado || 'confirmado', id_paciente, id_profesional, id_obra_social]
       );
       res.json({ id_turno: result.insertId, success: true });
     } catch (error) {

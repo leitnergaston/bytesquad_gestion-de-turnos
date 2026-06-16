@@ -70,7 +70,6 @@ CREATE TABLE Turno (
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
     estado ENUM('pendiente', 'confirmado', 'cancelado', 'ausente', 'modificado') DEFAULT 'confirmado',
-    motivo_consulta VARCHAR(255),
     id_paciente INT NOT NULL,
     id_profesional INT NOT NULL,
     id_obra_social INT NOT NULL,

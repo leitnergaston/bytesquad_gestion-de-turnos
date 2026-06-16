@@ -3,6 +3,15 @@ import { horariosBD } from '../config.js';
 export function _generarCalendario(container, year, month, clickableDates, clickHandler, mode = 'single', preSelected = []) {
     container.innerHTML = "";
     
+    // Nombres de los días de la semana
+    const diasSemana = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+    diasSemana.forEach(dia => {
+        const header = document.createElement('div');
+        header.className = 'dia-semana-header';
+        header.textContent = dia;
+        container.appendChild(header);
+    });
+
     // `getDay()` devuelve 0 para domingo, 1 para lunes, etc. Necesitamos que lunes sea 0.
     const firstDay = new Date(year, month, 1).getDay();
     const offset = firstDay === 0 ? 6 : firstDay - 1;

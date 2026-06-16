@@ -83,6 +83,11 @@ window.prepararModificacionTurno = async (turnoId, keepMonth = false) => {
     document.getElementById('mod-turno-id').textContent = turnoBase.id_turno;
     document.getElementById('mod-turno-paciente').textContent = `${turnoBase.pac_nombre} ${turnoBase.pac_apellido}`;
     document.getElementById('mod-turno-profesional').textContent = `${turnoBase.prof_nombre} ${turnoBase.prof_apellido} (${turnoBase.nombre_especialidad})`;
+    
+    // Convertir a base para dar formato YYYY-MM-DD a vista humana si se desea
+    const [y, m, d] = turnoBase.fecha.split("-");
+    const fechaOriginalDisp = `${d} de ${window.MESES[parseInt(m)-1]}`;
+    document.getElementById('mod-turno-fecha-hora').textContent = `${fechaOriginalDisp} (${turnoBase.hora.substring(0, 5)} hs)`;
 
     const year = window.currentDate.getFullYear(), month = window.currentDate.getMonth();
     document.querySelector("#pantalla-gestion-turno .calendario-titulo-texto").textContent = `${window.MESES[month]} ${year}`;

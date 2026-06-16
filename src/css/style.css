@@ -279,6 +279,13 @@ select option {
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
 }
+.dia-semana-header {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-texto-secundario);
+    padding-bottom: 0.5rem;
+}
 .celda-dia {
     padding: 0.8rem 0;
     text-align: center;
@@ -538,5 +545,34 @@ select option {
 @media (max-width: 768px) {
     .reprogramar-grid, .grid-form-y-lista, .agenda-config-container {
         grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #pantalla-confirmacion, #pantalla-confirmacion * {
+        visibility: visible;
+    }
+    #pantalla-confirmacion {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .tarjeta-confirmacion {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .tarjeta-confirmacion p, .tarjeta-confirmacion h3, .tarjeta-confirmacion span {
+        color: #000 !important;
+    }
+    button, .app-header {
+        display: none !important;
     }
 }
