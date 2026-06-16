@@ -83,7 +83,7 @@ async function _mostrarFormTurnoSecretaria() {
     try {
         const r1 = await fetch('/api/especialidades');
         const espList = await r1.json();
-        const opcionesEsp = espList.map(e => ({ value: e.id_especialidad, text: e.nombre }));
+        const opcionesEsp = espList.map(e => ({ value: e.id_especialidad, text: e.nombre_especialidad }));
         poblarSelect("sec-especialidad", opcionesEsp, "", "Seleccione especialidad...");
         
         const r2 = await fetch('/api/obras_sociales');
@@ -133,15 +133,36 @@ export async function actualizarCalendarioSecretaria() {
     cont.innerHTML = "Cargando...";
     
     try {
-        const resp = await fetch(`/api/agendas?id_profesional=${id_profesional}`);
-        const agendas = await resp.json();
+        const [agendasResp, turnosResp] = await Promise.all([
+            fetch(`/api/agendas?id_profesional=${id_profesional}`),
+            fetch(`/api/turnos`)
+        ]);
+        const agendas = await agendasResp.json();
+        const turnos = await turnosResp.json();
         selS.agendasProfesional = agendas;
         
-        const agendaDias = agendas.map(a => new Date(a.fecha_atencion).toISOString().split('T')[0]);
+        // Filtrar días que tengan al menos un horario libre (no ocupado)
+        const agendaDiasDisponibles = [];
+        for (const a of agendas) {
+            const fechaStr = a.fecha_atencion.substring(0, 10);
+            const turnosDia = turnos.filter(t => 
+                t.id_profesional === id_profesional && 
+                t.fecha === fechaStr && 
+                t.estado !== 'cancelado'
+            );
+            const ocupados = turnosDia.map(t => t.hora.substring(0, 5));
+            const configurados = a.horarios.map(h => h.substring(0, 5));
+            const libres = configurados.filter(h => !ocupados.includes(h));
             
-        _generarCalendario(cont, year, month, agendaDias, (d, f) => elegirDiaSecretaria(d, f));
+            if (libres.length > 0) {
+                agendaDiasDisponibles.push(fechaStr);
+            }
+        }
+            
+        _generarCalendario(cont, year, month, agendaDiasDisponibles, (d, f) => elegirDiaSecretaria(d, f));
     } catch(e) {
         cont.innerHTML = "Error loading agendas.";
+        console.error(e);
     }
 }
 window.actualizarCalendarioSecretaria = actualizarCalendarioSecretaria;
@@ -154,14 +175,14 @@ async function elegirDiaSecretaria(num, fechaStr) {
     const grilla = document.getElementById("sec-grilla-horarios");
     
     try {
-        const agendaStr = selS.agendasProfesional.find(a => new Date(a.fecha_atencion).toISOString().split('T')[0] === fechaStr);
+        const agendaStr = selS.agendasProfesional.find(a => a.fecha_atencion.substring(0, 10) === fechaStr);
         let horariosDisponibles = agendaStr ? agendaStr.horarios.map(h => h.substring(0, 5)) : null;
 
         const resp = await fetch(`/api/turnos`);
         const turnosData = await resp.json();
         const turnosEnEseDia = turnosData.filter(t => 
             t.id_profesional === selS.id_profesional && 
-            new Date(t.fecha).toISOString().split('T')[0] === fechaStr && 
+            t.fecha === fechaStr && 
             t.estado !== 'cancelado'
         );
         const horariosOcupados = turnosEnEseDia.map(t => t.hora.substring(0, 5));

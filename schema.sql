@@ -39,12 +39,14 @@ CREATE TABLE Paciente (
     FOREIGN KEY (id_obra_social) REFERENCES Obra_Social(id_obra_social)
 );
 
-CREATE TABLE Usuario_Admin (
+CREATE TABLE Usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL,
-    FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
+    id_profesional INT DEFAULT NULL,
+    FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
+    FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
 );
 
 -- Nivel 3: Agenda cumpliendo 1FN
@@ -67,7 +69,7 @@ CREATE TABLE Turno (
     id_turno INT AUTO_INCREMENT PRIMARY KEY,
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
-    estado ENUM('pendiente', 'confirmado', 'cancelado', 'ausente') DEFAULT 'confirmado',
+    estado ENUM('pendiente', 'confirmado', 'cancelado', 'ausente', 'modificado') DEFAULT 'confirmado',
     motivo_consulta VARCHAR(255),
     id_paciente INT NOT NULL,
     id_profesional INT NOT NULL,

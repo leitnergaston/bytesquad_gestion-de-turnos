@@ -527,8 +527,16 @@ select option {
     gap: 1.5rem;
 }
 
+/* Gestión de Obras Sociales y Especialidades layout grid */
+.grid-form-y-lista {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
 @media (max-width: 768px) {
-    .reprogramar-grid, .agenda-config-container {
+    .reprogramar-grid, .grid-form-y-lista, .agenda-config-container {
         grid-template-columns: 1fr;
     }
 }

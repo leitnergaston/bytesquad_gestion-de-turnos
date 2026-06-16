@@ -26,6 +26,115 @@ async function startServer() {
       queueLimit: 0
     });
     console.log("Conexión MySQL configurada.");
+
+    // Auto-Migración y Configuración del esquema de la Base de Datos al iniciar
+    setTimeout(async () => {
+      try {
+        const connCheck = await db.getConnection();
+        console.log("Chequeando y ejecutando migraciones necesarias...");
+        try {
+          // Verificar si existe la tabla Usuario_Admin y rename/drop
+          const [tables] = await connCheck.query("SHOW TABLES LIKE 'Usuario_Admin'");
+          
+          // Crear tabla Rol si no existe
+          await connCheck.query(`
+            CREATE TABLE IF NOT EXISTS Rol (
+                id_rol INT AUTO_INCREMENT PRIMARY KEY,
+                nombre_rol VARCHAR(50) NOT NULL
+            )
+          `);
+
+          if (tables.length > 0) {
+            console.log("Migrando de 'Usuario_Admin' a 'Usuario'...");
+            // Crear tabla Usuario si no existe
+            await connCheck.query(`
+              CREATE TABLE IF NOT EXISTS Usuario (
+                  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+                  username VARCHAR(100) UNIQUE NOT NULL,
+                  password VARCHAR(255) NOT NULL,
+                  id_rol INT NOT NULL,
+                  id_profesional INT DEFAULT NULL,
+                  FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
+                  FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
+              )
+            `);
+            // Copiar datos si existen
+            try {
+              await connCheck.query(`
+                INSERT IGNORE INTO Usuario (username, password, id_rol) 
+                SELECT username, password, id_rol FROM Usuario_Admin
+              `);
+            } catch (copyErr) {
+              console.log("No se pudieron copiar los datos de Usuario_Admin, tal vez ya existen: ", copyErr.message);
+            }
+            // Dropear la tabla vieja
+            await connCheck.query("DROP TABLE IF EXISTS Usuario_Admin");
+          } else {
+            // Crear la tabla Usuario directamente
+            await connCheck.query(`
+              CREATE TABLE IF NOT EXISTS Usuario (
+                  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+                  username VARCHAR(100) UNIQUE NOT NULL,
+                  password VARCHAR(255) NOT NULL,
+                  id_rol INT NOT NULL,
+                  id_profesional INT DEFAULT NULL,
+                  FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
+                  FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
+              )
+            `);
+          }
+
+          // Verificar si ya existía la tabla Usuario pero sin la columna id_profesional
+          const [columns] = await connCheck.query("SHOW COLUMNS FROM Usuario LIKE 'id_profesional'");
+          if (columns.length === 0) {
+            console.log("La tabla Usuario existe pero no tiene 'id_profesional'. Agregando columna...");
+            await connCheck.query("ALTER TABLE Usuario ADD COLUMN id_profesional INT DEFAULT NULL");
+            try {
+              await connCheck.query("ALTER TABLE Usuario ADD FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE");
+            } catch (fkErr) {
+              console.log("Nota al agregar FK de id_profesional: ", fkErr.message);
+            }
+          }
+
+          // Asegurar que el seed de roles esté completo
+          await connCheck.query("INSERT IGNORE INTO Rol (id_rol, nombre_rol) VALUES (1, 'Administrador'), (2, 'Secretaria'), (3, 'Profesional')");
+          // Renombrar 'Medico' a 'Profesional' si existía
+          await connCheck.query("UPDATE Rol SET nombre_rol = 'Profesional' WHERE id_rol = 3");
+
+          // Aseguramos usuarios por defecto
+          await connCheck.query("INSERT IGNORE INTO Usuario (username, password, id_rol) VALUES ('admin', '123', 1)");
+          await connCheck.query("INSERT IGNORE INTO Usuario (username, password, id_rol) VALUES ('secre', '123', 2)");
+
+          // Asociar el primero profesional disponible si existe
+          const [profs] = await connCheck.query("SELECT id_profesional FROM Profesional ORDER BY id_profesional LIMIT 1");
+          if (profs.length > 0) {
+            const id_prof = profs[0].id_profesional;
+            await connCheck.query("INSERT IGNORE INTO Usuario (username, password, id_rol, id_profesional) VALUES ('medico', '123', 3, ?)", [id_prof]);
+          } else {
+            await connCheck.query("INSERT IGNORE INTO Usuario (username, password, id_rol) VALUES ('medico', '123', 3)");
+          }
+
+          // Asegurar que el ENUM de estado en Turno incluya 'modificado'
+          try {
+            await connCheck.query(`
+              ALTER TABLE Turno MODIFY COLUMN estado ENUM('pendiente', 'confirmado', 'cancelado', 'ausente', 'modificado') DEFAULT 'confirmado'
+            `);
+            console.log("Columna Turno.estado modificada para incluir 'modificado'.");
+          } catch (alterErr) {
+            console.log("Nota al alterar la columna Turno.estado: ", alterErr.message);
+          }
+
+          console.log("Auto-migración completada con éxito.");
+        } catch (migrError) {
+          console.error("Error ejecutando migración de base de datos:", migrError);
+        } finally {
+          connCheck.release();
+        }
+      } catch (err) {
+        console.error("No se pudo obtener conexión para migraciones:", err);
+      }
+    }, 1000);
+
   } catch (err) {
     console.error("Error MySQL:", err);
   }
@@ -181,8 +290,8 @@ async function startServer() {
     try {
       const { id_profesional } = req.query;
       let query = `
-        SELECT a.id_agenda, a.id_profesional, a.fecha_atencion, 
-               h.id_horario, h.hora
+        SELECT a.id_agenda, a.id_profesional, DATE_FORMAT(a.fecha_atencion, '%Y-%m-%d') AS fecha_atencion, 
+               h.id_horario, TIME_FORMAT(h.hora, '%H:%i') AS hora
         FROM Agenda a
         LEFT JOIN Agenda_Horario_Dia h ON a.id_agenda = h.id_agenda
       `;
@@ -205,8 +314,7 @@ async function startServer() {
             horarios: []
           };
         }
-        if (row.id_horario) {
-          // Parsear y formatear hora
+        if (row.id_horario && row.hora) {
           agendasMap[key].horarios.push(row.hora);
         }
       });
@@ -308,7 +416,7 @@ async function startServer() {
   app.get("/api/turnos", async (req, res) => {
     try {
       const query = `
-        SELECT t.*, 
+        SELECT t.id_turno, DATE_FORMAT(t.fecha, '%Y-%m-%d') AS fecha, TIME_FORMAT(t.hora, '%H:%i') AS hora, t.estado, t.motivo_consulta, t.id_paciente, t.id_profesional, t.id_obra_social,
                p.nombre AS pac_nombre, p.apellido AS pac_apellido, p.dni AS pac_dni,
                prof.nombre AS prof_nombre, prof.apellido AS prof_apellido,
                e.nombre_especialidad,
@@ -331,6 +439,13 @@ async function startServer() {
   app.post("/api/turnos", async (req, res) => {
     try {
       const { fecha, hora, estado, motivo_consulta, id_paciente, id_profesional, id_obra_social } = req.body;
+      
+      // Eliminar turno cancelado anterior en el mismo horario si existe para evitar violación de UNIQUE
+      await db.query(
+        "DELETE FROM Turno WHERE id_profesional = ? AND fecha = ? AND hora = ? AND estado = 'cancelado'",
+        [id_profesional, fecha, hora]
+      );
+
       const [result] = await db.query(
         "INSERT INTO Turno (fecha, hora, estado, motivo_consulta, id_paciente, id_profesional, id_obra_social) VALUES (?, ?, ?, ?, ?, ?, ?)",
         [fecha, hora, estado || 'confirmado', motivo_consulta, id_paciente, id_profesional, id_obra_social]
@@ -366,6 +481,12 @@ async function startServer() {
         id_paciente = result.insertId;
       }
 
+      // Eliminar turno cancelado anterior en el mismo horario si existe para evitar violación de UNIQUE
+      await connection.query(
+        "DELETE FROM Turno WHERE id_profesional = ? AND fecha = ? AND hora = ? AND estado = 'cancelado'",
+        [id_profesional, fecha, hora]
+      );
+
       const [resTurno] = await connection.query(
         "INSERT INTO Turno (fecha, hora, estado, id_paciente, id_profesional, id_obra_social) VALUES (?, ?, 'confirmado', ?, ?, ?)",
         [fecha, hora, id_paciente, id_profesional, paciente.id_obra_social]
@@ -398,6 +519,17 @@ async function startServer() {
     try {
       const { id } = req.params;
       const { fecha, hora, estado } = req.body;
+
+      // Obtener el id_profesional del turno actual para borrar posibles turnos cancelados en la nueva fecha/hora
+      const [turnoRows] = await db.query("SELECT id_profesional FROM Turno WHERE id_turno = ?", [id]);
+      if (turnoRows.length > 0) {
+        const id_profesional = turnoRows[0].id_profesional;
+        await db.query(
+          "DELETE FROM Turno WHERE id_profesional = ? AND fecha = ? AND hora = ? AND estado = 'cancelado'",
+          [id_profesional, fecha, hora]
+        );
+      }
+
       let query = "UPDATE Turno SET fecha=?, hora=?";
       const params = [fecha, hora];
       if (estado) {
@@ -408,6 +540,133 @@ async function startServer() {
       params.push(id);
       
       await db.query(query, params);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // AUTENTICACIÓN REAL
+  // ============================================
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const query = `
+        SELECT u.id_usuario, u.username, u.password, u.id_rol, u.id_profesional,
+               r.nombre_rol,
+               p.nombre AS prof_nombre, p.apellido AS prof_apellido
+        FROM Usuario u
+        JOIN Rol r ON u.id_rol = r.id_rol
+        LEFT JOIN Profesional p ON u.id_profesional = p.id_profesional
+        WHERE u.username = ? AND u.password = ?
+      `;
+      const [rows] = await db.query(query, [username, password]);
+      
+      if (rows.length > 0) {
+        const user = rows[0];
+        res.json({
+          success: true,
+          user: {
+            id_usuario: user.id_usuario,
+            username: user.username,
+            id_rol: user.id_rol,
+            nombre_rol: user.nombre_rol,
+            id_profesional: user.id_profesional,
+            profesional_nombre: user.id_profesional ? `${user.prof_nombre} ${user.prof_apellido}` : null
+          }
+        });
+      } else {
+        res.status(401).json({ success: false, error: "⚠️ Usuario o contraseña incorrectos" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // ABM OBRAS SOCIALES
+  // ============================================
+  app.post("/api/obras_sociales", async (req, res) => {
+    try {
+      const { nombre } = req.body;
+      const [result] = await db.query("INSERT INTO Obra_Social (nombre) VALUES (?)", [nombre]);
+      res.json({ id_obra_social: result.insertId, nombre, success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/obras_sociales/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nombre } = req.body;
+      await db.query("UPDATE Obra_Social SET nombre = ? WHERE id_obra_social = ?", [nombre, id]);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/obras_sociales/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Controlar si tiene pacientes vinculados
+      const [pacs] = await db.query("SELECT id_paciente FROM Paciente WHERE id_obra_social = ? LIMIT 1", [id]);
+      if (pacs.length > 0) {
+        return res.status(400).json({ success: false, error: "No se puede eliminar la obra social porque tiene pacientes vinculados." });
+      }
+      
+      await db.query("DELETE FROM Obra_Social WHERE id_obra_social = ?", [id]);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // ABM ESPECIALIDADES
+  // ============================================
+  app.post("/api/especialidades", async (req, res) => {
+    try {
+      const { nombre_especialidad, icono } = req.body;
+      const [result] = await db.query("INSERT INTO Especialidad (nombre_especialidad, icono) VALUES (?, ?)", [nombre_especialidad, icono || '🩺']);
+      res.json({ id_especialidad: result.insertId, nombre_especialidad, icono, success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/especialidades/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nombre_especialidad, icono } = req.body;
+      await db.query("UPDATE Especialidad SET nombre_especialidad = ?, icono = ? WHERE id_especialidad = ?", [nombre_especialidad, icono || '🩺', id]);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/especialidades/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Controlar si tiene profesionales vinculados
+      const [profs] = await db.query("SELECT id_profesional FROM Profesional WHERE id_especialidad = ? LIMIT 1", [id]);
+      if (profs.length > 0) {
+        return res.status(400).json({ success: false, error: "No se puede eliminar la especialidad porque tiene profesionales vinculados." });
+      }
+      
+      await db.query("DELETE FROM Especialidad WHERE id_especialidad = ?", [id]);
       res.json({ success: true });
     } catch (error) {
       console.error(error);

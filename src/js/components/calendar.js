@@ -29,9 +29,9 @@ export function _generarCalendario(container, year, month, clickableDates, click
             celda.onclick = () => {
                 if (mode === 'single') {
                     // Deseleccionar el previamente seleccionado
-                    container.querySelectorAll('.celda-dia.seleccionada').forEach(c => c.classList.remove('seleccionada'));
+                    container.querySelectorAll('.celda-dia.seleccionado').forEach(c => c.classList.remove('seleccionado'));
                     // Seleccionar el nuevo
-                    celda.classList.add('seleccionada');
+                    celda.classList.add('seleccionado');
                 }
                 // Ejecutar el handler con el día, el string de fecha y el elemento HTML
                 clickHandler(d, fechaStr, celda);

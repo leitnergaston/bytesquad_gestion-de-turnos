@@ -7,6 +7,8 @@ import { abrirGestionPacientes, setupGestionPacientes } from './admin/pacientes.
 import { abrirGestionProfesionales, setupGestionProfesionales } from './admin/profesionales.js';
 import { abrirConfiguracionAgenda, setupConfiguracionAgenda } from './admin/agendas.js';
 import { abrirCrearTurno } from './admin/crearTurno.js';
+import { abrirGestionObrasSociales, setupObrasSociales } from './admin/obrasSociales.js';
+import { abrirGestionEspecialidades, setupEspecialidades } from './admin/especialidades.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -16,7 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ========= NAVEGACIÓN PRINCIPAL =========
     document.getElementById('btn-reservar-turno').addEventListener('click', iniciarReserva);
-    document.getElementById('btn-secretaria').addEventListener('click', intentarIngresoSecretaria);
+    
+    const btnHeaderLogin = document.getElementById('btn-header-login');
+    if (btnHeaderLogin) {
+        btnHeaderLogin.addEventListener('click', intentarIngresoSecretaria);
+    }
+
     document.querySelectorAll('.btn-volver-inicio, #logo').forEach(btn => {
         btn.addEventListener('click', () => irA('inicio'));
     });
@@ -34,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-dash-agendas').addEventListener('click', abrirConfiguracionAgenda);
     document.getElementById('btn-dash-pacientes').addEventListener('click', abrirGestionPacientes);
     document.getElementById('btn-dash-nuevo-turno').addEventListener('click', abrirCrearTurno);
+    document.getElementById('btn-dash-obras-sociales').addEventListener('click', abrirGestionObrasSociales);
+    document.getElementById('btn-dash-especialidades').addEventListener('click', abrirGestionEspecialidades);
     document.querySelectorAll('.btn-volver-dash').forEach(btn => {
         btn.addEventListener('click', mostrarDashboard);
     });
@@ -42,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupGestionPacientes();
     setupGestionProfesionales();
     setupConfiguracionAgenda();
+    setupObrasSociales();
+    setupEspecialidades();
 
     // ========= INICIO =========
     irA('inicio');

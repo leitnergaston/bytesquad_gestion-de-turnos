@@ -53,8 +53,8 @@ export async function inicializarConfigAgenda() {
         const res = await fetch(`/api/agendas?id_profesional=${currentProfId}`);
         const agendaProf = await res.json();
         
-        // El backend devuelve fechas en formato ISO con hora (ej: "2026-07-06T00:00:00.000Z"), formatear a YYYY-MM-DD
-        seleccionDiasTemp = agendaProf.map(a => new Date(a.fecha_atencion).toISOString().split('T')[0]);
+        // El backend devuelve fechas formateadas para evitar desajustes de zona horaria
+        seleccionDiasTemp = agendaProf.map(a => a.fecha_atencion.substring(0, 10));
         
         let horariosGlobales = [];
         agendaProf.forEach(a => horariosGlobales.push(...(a.horarios || [])));

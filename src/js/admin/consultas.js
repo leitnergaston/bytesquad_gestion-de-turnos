@@ -91,15 +91,33 @@ window.prepararModificacionTurno = async (turnoId, keepMonth = false) => {
     try {
         const resp = await fetch(`/api/agendas?id_profesional=${turnoBase.id_profesional}`);
         const agendas = await resp.json();
-        const agendaDias = agendas.map(a => new Date(a.fecha_atencion).toISOString().split('T')[0]);
         
-        _generarCalendario(calCont, year, month, agendaDias, (d, fechaStr) => {
+        // Filtrar días que tengan al menos un horario libre (excluyendo este turno que se está reprogramando)
+        const agendaDiasDisponibles = [];
+        for (const a of agendas) {
+            const fechaStr = a.fecha_atencion.substring(0, 10);
+            const turnosDia = turnosCache.filter(t => 
+                t.id_profesional === turnoBase.id_profesional && 
+                t.fecha === fechaStr && 
+                t.estado !== 'cancelado' &&
+                t.id_turno !== turnoBase.id_turno
+            );
+            const ocupados = turnosDia.map(t => t.hora.substring(0, 5));
+            const configurados = a.horarios.map(h => h.substring(0, 5));
+            const libres = configurados.filter(h => !ocupados.includes(h));
+            
+            if (libres.length > 0) {
+                agendaDiasDisponibles.push(fechaStr);
+            }
+        }
+        
+        _generarCalendario(calCont, year, month, agendaDiasDisponibles, (d, fechaStr) => {
             modTemp.nuevoDiaStr = fechaStr;
             modTemp.nuevoDiaDisplay = `${d} de ${window.MESES[month]}`;
             const hrCont = document.getElementById("mod-horarios-container");
             hrCont.innerHTML = '';
             
-            const agendaDia = agendas.find(a => new Date(a.fecha_atencion).toISOString().split('T')[0] === fechaStr);
+            const agendaDia = agendas.find(a => a.fecha_atencion.substring(0, 10) === fechaStr);
             const horariosDisp = agendaDia ? agendaDia.horarios.map(h => h.substring(0, 5)) : null;
             
             const turnosOcupadosData = turnosCache.filter(t => 

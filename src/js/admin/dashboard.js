@@ -1,6 +1,26 @@
 import { irA } from '../navigation.js';
 
 export async function mostrarDashboard() {
+    // 1. Validar acceso por rol
+    const user = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const rol = user.id_rol; // 1 = Administrador, 2 = Secretaria
+
+    const btnProfs = document.getElementById('btn-dash-profesionales');
+    const btnOS = document.getElementById('btn-dash-obras-sociales');
+    const btnEsp = document.getElementById('btn-dash-especialidades');
+
+    if (rol === 1) {
+        // Administrador ve todos los botones
+        if (btnProfs) btnProfs.style.display = 'flex';
+        if (btnOS) btnOS.style.display = 'flex';
+        if (btnEsp) btnEsp.style.display = 'flex';
+    } else {
+        // Secretaria NO ve profesionales, obras sociales ni especialidades
+        if (btnProfs) btnProfs.style.display = 'none';
+        if (btnOS) btnOS.style.display = 'none';
+        if (btnEsp) btnEsp.style.display = 'none';
+    }
+
     const hoyStr = new Date().toISOString().split('T')[0];
     const cont = document.getElementById('dash-proximos-turnos');
     cont.innerHTML = '<p>Cargando dashboard...</p>';
@@ -16,7 +36,7 @@ export async function mostrarDashboard() {
         const pacientes = await respPac.json();
         const profesionales = await respProf.json();
         
-        const turnosHoy = dTurnos.filter(t => new Date(t.fecha).toISOString().split('T')[0] === hoyStr && t.estado !== 'Cancelado');
+        const turnosHoy = dTurnos.filter(t => t.fecha === hoyStr && t.estado !== 'Cancelado');
         
         document.getElementById('dash-stat-pacientes').textContent = pacientes.length;
         document.getElementById('dash-stat-profesionales').textContent = profesionales.length;

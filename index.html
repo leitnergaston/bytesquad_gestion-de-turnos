@@ -11,23 +11,26 @@
 </head>
 <body>
     <header class="app-header">
-        <div class="container">
-            <h1 id="logo">TurnoClinic 🏥</h1>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1.5rem;">
+            <h1 id="logo" style="margin: 0;">TurnoClinic 🏥</h1>
+            <button id="btn-header-login" class="btn-secundario btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; padding: 0.6rem 1.2rem; font-size: 0.95rem; border-radius: 0.75rem; font-weight: 600;">👤 Iniciar Sesión</button>
         </div>
     </header>
-    <span class="version" style="position: absolute; bottom: 1rem; right: 1rem; font-size: 11px; color: #cbd5e1; font-weight: 700; letter-spacing: 0.5px;">v13.06.26_1439</span>
+    <!-- Versión del programa (editable por el usuario, mantenida para actualizaciones) -->
+    <div style="position: absolute; right: 1rem; bottom: 1rem; max-width: 900px; padding: 0 1.5rem;">
+        <span class="version-programa" style="font-size: 0.8rem; color: var(--color-texto-secundario);">v14.06.26_2243</span>
+    </div>
 
     <main class="container">
         <!-- ======================================= -->
         <!-- PANTALLA INICIO -->
         <!-- ======================================= -->
         <div id="pantalla-inicio" class="pantalla activa">
-            <div class="tarjeta-bienvenida">
+            <div class="tarjeta-bienvenida" style="padding: 3.5rem 2rem; border-radius: 2rem;">
                 <h2>Bienvenido a TurnoClinic</h2>
-                <p>Gestione sus turnos de forma rápida y sencilla.</p>
-                <div class="acciones-inicio">
-                    <button id="btn-reservar-turno" class="btn-primario">Reservar un Turno</button>
-                    <button id="btn-secretaria" class="btn-secundario">Soy Secretaria</button>
+                <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--color-texto-secundario);">Gestione sus turnos de forma rápida y sencilla.</p>
+                <div class="acciones-inicio" style="margin-top: 0; display: flex; justify-content: center;">
+                    <button id="btn-reservar-turno" class="btn-primario" style="font-size: 1.15rem; padding: 1rem 3rem; border-radius: 1rem; cursor: pointer; transition: all 0.3s ease;">📅 Reservar un Turno</button>
                 </div>
             </div>
         </div>
@@ -153,6 +156,8 @@
                  <button id="btn-dash-pacientes" class="btn-accion-dash">👥 Gestionar Pacientes</button>
                  <button id="btn-dash-profesionales" class="btn-accion-dash">👨‍⚕️ Gestionar Profesionales</button>
                  <button id="btn-dash-agendas" class="btn-accion-dash">⚙️ Configurar Agendas</button>
+                  <button id="btn-dash-obras-sociales" class="btn-accion-dash">🏥 Obras Sociales</button>
+                  <button id="btn-dash-especialidades" class="btn-accion-dash">🔬 Especialidades</button>
             </div>
 
             <div class="tarjeta-lista">
@@ -377,6 +382,143 @@
                 </div>
                 
                 <button class="btn-primario" style="margin-top: 1.5rem;" onclick="guardarTurnoSecretaria()">Confirmar y Guardar Turno</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA GESTION OBRAS SOCIALES (ADMIN ONLY) -->
+        <div id="pantalla-gestion-obras-sociales" class="pantalla">
+            <div class="header-pantalla">
+                <h2>Gestión de Obras Sociales</h2>
+                <button class="btn-secundario btn-volver-dash">Volver</button>
+            </div>
+            
+            <div class="form-grupo" style="margin-bottom: 1.5rem;">
+                <input type="text" id="buscar-os-admin" placeholder="🔍 Buscar obra social por nombre..." style="width: 100%; max-width: 400px; padding: 0.75rem;">
+            </div>
+
+            <div class="grid-form-y-lista">
+                <div class="tarjeta-form">
+                    <button id="btn-agregar-os" class="btn-primario" style="margin-bottom: 1rem; width: 100%;">➕ Nueva Obra Social</button>
+                    
+                    <div id="form-gestion-os" style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; margin-top: 1rem;">
+                        <h4 id="os-form-titulo">➕ Nueva Obra Social</h4>
+                        <form id="form-os-form">
+                            <div class="form-grupo">
+                                <label for="os-nombre-input">Nombre</label>
+                                <input type="text" id="os-nombre-input" required placeholder="Ej: OSDE, Swiss Medical">
+                            </div>
+                            <div class="acciones-form" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                <button type="submit" class="btn-primario" style="flex: 1;">Guardar</button>
+                                <button type="button" id="btn-cancelar-os" class="btn-secundario" style="flex: 1;">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tarjeta-lista">
+                    <h4>Obras Sociales Registradas</h4>
+                    <div class="tabla-wrapper">
+                        <table class="tabla-moderna">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th class="acciones">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-os-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA GESTION ESPECIALIDADES (ADMIN ONLY) -->
+        <div id="pantalla-gestion-especialidades" class="pantalla">
+            <div class="header-pantalla">
+                <h2>Gestión de Especialidades</h2>
+                <button class="btn-secundario btn-volver-dash">Volver</button>
+            </div>
+            
+            <div class="form-grupo" style="margin-bottom: 1.5rem;">
+                <input type="text" id="buscar-esp-admin" placeholder="🔍 Buscar especialidad por nombre..." style="width: 100%; max-width: 400px; padding: 0.75rem;">
+            </div>
+
+            <div class="grid-form-y-lista">
+                <div class="tarjeta-form">
+                    <button id="btn-agregar-esp" class="btn-primario" style="margin-bottom: 1rem; width: 100%;">➕ Nueva Especialidad</button>
+                    
+                    <div id="form-gestion-esp" style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; margin-top: 1rem;">
+                        <h4 id="esp-form-titulo">➕ Nueva Especialidad</h4>
+                        <form id="form-esp-form">
+                            <div class="form-grupo">
+                                <label for="esp-nombre-input">Nombre</label>
+                                <input type="text" id="esp-nombre-input" required placeholder="Ej: Cardiología, Pediatría">
+                            </div>
+                            <div class="form-grupo" style="margin-top: 0.5rem;">
+                                <label for="esp-icono-input">Ícono / Emoji</label>
+                                <input type="text" id="esp-icono-input" required value="🩺" style="font-size: 1.25rem; text-align: center;">
+                            </div>
+                            <div class="acciones-form" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                <button type="submit" class="btn-primario" style="flex: 1;">Guardar</button>
+                                <button type="button" id="btn-cancelar-esp" class="btn-secundario" style="flex: 1;">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tarjeta-lista">
+                    <h4>Especialidades Registradas</h4>
+                    <div class="tabla-wrapper">
+                        <table class="tabla-moderna">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th style="width: 80px; text-align: center;">Ícono</th>
+                                    <th>Nombre</th>
+                                    <th class="acciones">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-esp-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA PROFESIONAL AGENDA -->
+        <div id="pantalla-profesional-agenda" class="pantalla">
+            <div class="header-pantalla">
+                <div>
+                    <h2 id="prof-nombre-display">Dr/a. Médico</h2>
+                    <p style="color: var(--color-texto-secundario); font-size: 0.9rem;">Historial mensual de turnos asignados</p>
+                </div>
+                <button id="btn-prof-logout" class="btn-rojo-sm btn-logout" style="font-size: 0.95rem; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600;">Cerrar Sesión</button>
+            </div>
+
+            <div class="tarjeta-lista" style="margin-top: 1.5rem;">
+                <div class="calendario-header" style="justify-content: center; gap: 2rem; margin-bottom: 1.5rem;">
+                    <button class="btn-accion" onclick="changeMonth(-1, 'profesional')">◀</button>
+                    <h3 id="prof-mes-titulo" class="calendario-titulo-texto" style="margin: 0; min-width: 200px; text-align: center;">-</h3>
+                    <button class="btn-accion" onclick="changeMonth(1, 'profesional')">▶</button>
+                </div>
+
+                <div class="tabla-wrapper">
+                    <table class="tabla-moderna">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Paciente</th>
+                                <th>DNI</th>
+                                <th>Detalle Contacto</th>
+                                <th>Obra Social</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-profesional-turnos-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

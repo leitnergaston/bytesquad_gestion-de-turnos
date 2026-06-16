@@ -69,15 +69,35 @@ export async function generarCalendarioPaciente() {
     document.getElementById("contenedor-calendario").innerHTML = "<p>Cargando días disponibles...</p>";
 
     try {
-        const resp = await fetch(`/api/agendas?id_profesional=${selP.id_profesional}`);
-        const agendas = await resp.json();
+        const [agendasResp, turnosResp] = await Promise.all([
+            fetch(`/api/agendas?id_profesional=${selP.id_profesional}`),
+            fetch(`/api/turnos`)
+        ]);
+        const agendas = await agendasResp.json();
+        const turnos = await turnosResp.json();
         
-        // El formato de fecha devuelto es ISO. Convertimos a YYYY-MM-DD para el calendario
-        const agendaDias = agendas.map(a => new Date(a.fecha_atencion).toISOString().split('T')[0]);
         // Guardamos las agendas en el objeto temporal para usarlas en los horarios
         selP.agendasProfesional = agendas;
 
-        _generarCalendario(document.getElementById("contenedor-calendario"), year, month, agendaDias, (d, f) => elegirDia(d, f));
+        // Filtrar días que tengan al menos un horario libre (no ocupado)
+        const agendaDiasDisponibles = [];
+        for (const a of agendas) {
+            const fechaStr = a.fecha_atencion.substring(0, 10);
+            const turnosDia = turnos.filter(t => 
+                t.id_profesional === selP.id_profesional && 
+                t.fecha === fechaStr && 
+                t.estado !== 'cancelado'
+            );
+            const ocupados = turnosDia.map(t => t.hora.substring(0, 5));
+            const configurados = a.horarios.map(h => h.substring(0, 5));
+            const libres = configurados.filter(h => !ocupados.includes(h));
+            
+            if (libres.length > 0) {
+                agendaDiasDisponibles.push(fechaStr);
+            }
+        }
+
+        _generarCalendario(document.getElementById("contenedor-calendario"), year, month, agendaDiasDisponibles, (d, f) => elegirDia(d, f));
     } catch(e) {
         console.error(e);
         document.getElementById("contenedor-calendario").innerHTML = "<p class='msg-error'>Error al cargar días disponibles.</p>";
@@ -94,8 +114,8 @@ async function elegirDia(num, fechaStr) {
 
     try {
         // Encontrar los horarios disponibles para esta agenda específica
-        // Comparando contra las fechas devueltas (que traen info temporal como "T00:00:00.000Z")
-        const agendaStr = selP.agendasProfesional.find(a => new Date(a.fecha_atencion).toISOString().split('T')[0] === fechaStr);
+        // Comparando contra las fechas devueltas
+        const agendaStr = selP.agendasProfesional.find(a => a.fecha_atencion.substring(0, 10) === fechaStr);
         // Si no hay agendaDia específica, mandamos null, lo que hará el fallback
         let horariosDisponibles = agendaStr ? agendaStr.horarios.map(h => h.substring(0, 5)) : null;
 
@@ -104,7 +124,7 @@ async function elegirDia(num, fechaStr) {
         const turnosOcupadosData = await resp.json();
         const turnosEnEseDia = turnosOcupadosData.filter(t => 
             t.id_profesional === selP.id_profesional && 
-            new Date(t.fecha).toISOString().split('T')[0] === fechaStr && 
+            t.fecha === fechaStr && 
             t.estado !== 'cancelado'
         );
         const horariosOcupados = turnosEnEseDia.map(t => t.hora.substring(0, 5));

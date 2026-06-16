@@ -7,6 +7,22 @@ export function irA(idPantalla) {
         nueva.classList.add('activa');
         window.scrollTo(0, 0);
     }
+
+    // Actualizar dinámicamente el botón de login en el header
+    const btn = document.getElementById('btn-header-login');
+    if (btn) {
+        const uStr = localStorage.getItem('usuario');
+        if (uStr) {
+            try {
+                const user = JSON.parse(uStr);
+                btn.innerHTML = `👤 ${user.username.toUpperCase()}`;
+            } catch (e) {
+                btn.innerHTML = `👤 Iniciar Sesión`;
+            }
+        } else {
+            btn.innerHTML = `👤 Iniciar Sesión`;
+        }
+    }
 }
 window.irA = irA;
 
@@ -33,6 +49,9 @@ window.changeMonth = (dir, calendarType) => {
             break;
         case 'agenda-multiselect':
             import('./admin/agendas.js').then(module => module.inicializarConfigAgenda());
+            break;
+        case 'profesional':
+            import('./admin/profesionalesAgenda.js').then(module => module.renderizarTurnosProfesional());
             break;
     }
 };
