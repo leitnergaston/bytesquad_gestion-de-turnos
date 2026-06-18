@@ -33,9 +33,6 @@ async function startServer() {
         const connCheck = await db.getConnection();
         console.log("Chequeando y ejecutando migraciones necesarias...");
         try {
-          // Verificar si existe la tabla Usuario_Admin y rename/drop
-          const [tables] = await connCheck.query("SHOW TABLES LIKE 'Usuario_Admin'");
-          
           // Crear tabla Rol si no existe
           await connCheck.query(`
             CREATE TABLE IF NOT EXISTS Rol (
@@ -44,45 +41,18 @@ async function startServer() {
             )
           `);
 
-          if (tables.length > 0) {
-            console.log("Migrando de 'Usuario_Admin' a 'Usuario'...");
-            // Crear tabla Usuario si no existe
-            await connCheck.query(`
-              CREATE TABLE IF NOT EXISTS Usuario (
-                  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-                  username VARCHAR(100) UNIQUE NOT NULL,
-                  password VARCHAR(255) NOT NULL,
-                  id_rol INT NOT NULL,
-                  id_profesional INT DEFAULT NULL,
-                  FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
-                  FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
-              )
-            `);
-            // Copiar datos si existen
-            try {
-              await connCheck.query(`
-                INSERT IGNORE INTO Usuario (username, password, id_rol) 
-                SELECT username, password, id_rol FROM Usuario_Admin
-              `);
-            } catch (copyErr) {
-              console.log("No se pudieron copiar los datos de Usuario_Admin, tal vez ya existen: ", copyErr.message);
-            }
-            // Dropear la tabla vieja
-            await connCheck.query("DROP TABLE IF EXISTS Usuario_Admin");
-          } else {
-            // Crear la tabla Usuario directamente
-            await connCheck.query(`
-              CREATE TABLE IF NOT EXISTS Usuario (
-                  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-                  username VARCHAR(100) UNIQUE NOT NULL,
-                  password VARCHAR(255) NOT NULL,
-                  id_rol INT NOT NULL,
-                  id_profesional INT DEFAULT NULL,
-                  FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
-                  FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
-              )
-            `);
-          }
+          // Crear la tabla Usuario
+          await connCheck.query(`
+            CREATE TABLE IF NOT EXISTS Usuario (
+                id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                id_rol INT NOT NULL,
+                id_profesional INT DEFAULT NULL,
+                FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
+                FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
+            )
+          `);
 
           // Verificar si ya existía la tabla Usuario pero sin la columna id_profesional
           const [columns] = await connCheck.query("SHOW COLUMNS FROM Usuario LIKE 'id_profesional'");

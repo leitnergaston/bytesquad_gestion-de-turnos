@@ -10,7 +10,7 @@ export let rolTabla = [];
 // Nivel 2 (Actores)
 export let profesionalTabla = [];
 export let pacienteTabla = [];
-export let usuario_adminTabla = [];
+export let usuarioTabla = [];
 
 // Nivel 3 (Negocio y Transacciones Core)
 export let agenda_profesionalTabla = [];
