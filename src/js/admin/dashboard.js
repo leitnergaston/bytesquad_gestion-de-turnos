@@ -8,17 +8,20 @@ export async function mostrarDashboard() {
     const btnProfs = document.getElementById('btn-dash-profesionales');
     const btnOS = document.getElementById('btn-dash-obras-sociales');
     const btnEsp = document.getElementById('btn-dash-especialidades');
+    const btnSec = document.getElementById('btn-dash-secretarias');
 
     if (rol === 1) {
         // Administrador ve todos los botones
         if (btnProfs) btnProfs.style.display = 'flex';
         if (btnOS) btnOS.style.display = 'flex';
         if (btnEsp) btnEsp.style.display = 'flex';
+        if (btnSec) btnSec.style.display = 'flex';
     } else {
         // Secretaria NO ve profesionales, obras sociales ni especialidades
         if (btnProfs) btnProfs.style.display = 'none';
         if (btnOS) btnOS.style.display = 'none';
         if (btnEsp) btnEsp.style.display = 'none';
+        if (btnSec) btnSec.style.display = 'none';
     }
 
     const hoyStr = new Date().toISOString().split('T')[0];

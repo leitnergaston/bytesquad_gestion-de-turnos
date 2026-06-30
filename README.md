@@ -8,3 +8,6 @@
 2. Levantar la base de datos en workbench:
 3. Ejecutar la app:
    `npm run dev`
+
+
+**Version:** v18.06.26_1701

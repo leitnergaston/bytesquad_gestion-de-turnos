@@ -28,11 +28,13 @@ window.irA = irA;
 
 // Navegación calendarios
 window.changeMonth = (dir, calendarType) => {
+    // Avoid date skipping by setting the day to 1 before changing month
+    window.currentDate.setDate(1);
     window.currentDate.setMonth(window.currentDate.getMonth() + dir);
     
     switch (calendarType) {
         case 'paciente':
-            import('./patient/booking.js').then(module => module.generarCalendarioPaciente());
+            import('./patient/booking.js').then(module => module.recargarCalendarioPaciente());
             break;
         case 'secretaria':
             import('./admin/crearTurno.js').then(module => module.actualizarCalendarioSecretaria());

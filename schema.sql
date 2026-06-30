@@ -39,14 +39,26 @@ CREATE TABLE Paciente (
     FOREIGN KEY (id_obra_social) REFERENCES Obra_Social(id_obra_social)
 );
 
+CREATE TABLE Secretaria (
+    id_secretaria INT AUTO_INCREMENT PRIMARY KEY,
+    dni VARCHAR(20) UNIQUE NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
+);
+
 CREATE TABLE Usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL,
     id_profesional INT DEFAULT NULL,
+    id_paciente INT DEFAULT NULL,
+    id_secretaria INT DEFAULT NULL,
     FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
-    FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
+    FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE,
+    FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente) ON DELETE CASCADE,
+    FOREIGN KEY (id_secretaria) REFERENCES Secretaria(id_secretaria) ON DELETE CASCADE
 );
 
 -- Nivel 3: Agenda cumpliendo 1FN

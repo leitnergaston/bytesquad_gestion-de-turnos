@@ -176,10 +176,22 @@ h2, h3, h4 {
 }
 
 .btn-link {
-    background: none;
-    color: var(--color-primario);
-    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--color-texto-secundario);
+    padding: 0.5rem 1rem;
     margin-top: 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+}
+.btn-link:hover {
+    color: var(--color-primario);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .form-grupo {
@@ -437,6 +449,7 @@ select option {
 .estado-confirmado { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
 .estado-modificado { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
 .estado-cancelado { background: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
+.estado-finalizado { background: rgba(148, 163, 184, 0.1); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.2); }
 
 .tabla-wrapper { overflow-x: auto; }
 .tabla-moderna {

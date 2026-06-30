@@ -9,6 +9,7 @@ import { abrirConfiguracionAgenda, setupConfiguracionAgenda } from './admin/agen
 import { abrirCrearTurno } from './admin/crearTurno.js';
 import { abrirGestionObrasSociales, setupObrasSociales } from './admin/obrasSociales.js';
 import { abrirGestionEspecialidades, setupEspecialidades } from './admin/especialidades.js';
+import { abrirGestionSecretarias, setupGestionSecretarias } from './admin/secretarias.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-dash-nuevo-turno').addEventListener('click', abrirCrearTurno);
     document.getElementById('btn-dash-obras-sociales').addEventListener('click', abrirGestionObrasSociales);
     document.getElementById('btn-dash-especialidades').addEventListener('click', abrirGestionEspecialidades);
+    document.getElementById('btn-dash-secretarias').addEventListener('click', abrirGestionSecretarias);
     document.querySelectorAll('.btn-volver-dash').forEach(btn => {
         btn.addEventListener('click', mostrarDashboard);
     });
@@ -53,7 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setupConfiguracionAgenda();
     setupObrasSociales();
     setupEspecialidades();
+    setupGestionSecretarias();
 
     // ========= INICIO =========
     irA('inicio');
+    
+    // Poblar selectores globales (ej: Obra social en registro de pacientes)
+    fetch('/api/obras_sociales')
+        .then(res => res.json())
+        .then(data => {
+            const opciones = data.map(os => ({ value: os.id_obra_social, text: os.nombre }));
+            import('./utils.js').then(module => {
+                module.poblarSelect('reg-paciente-obra-social', opciones, null, 'Seleccione su Obra Social');
+            });
+        })
+        .catch(console.error);
 });

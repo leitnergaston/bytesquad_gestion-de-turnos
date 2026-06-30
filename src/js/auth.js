@@ -11,6 +11,78 @@ export function setupAuth() {
     document.getElementById('btn-prof-logout').addEventListener('click', cerrarSesion);
 }
 
+window.loginPaciente = async () => {
+    const username = document.getElementById("login-paciente-dni").value.trim();
+    const password = document.getElementById("login-paciente-password").value.trim();
+    
+    if (!username || !password) {
+        alert("Por favor ingrese DNI y contraseña.");
+        return;
+    }
+
+    try {
+        const resp = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (resp.ok) {
+            const data = await resp.json();
+            if (data.user.id_rol === 4 || data.user.id_paciente) {
+                sessionStorage.setItem('pacienteAuth', JSON.stringify(data.user));
+                irA("busqueda-dual");
+            } else {
+                alert("Esta cuenta no es de paciente.");
+            }
+        } else {
+            const err = await resp.json();
+            alert(err.error || "Datos incorrectos.");
+        }
+    } catch (e) {
+        alert("Error de conexión.");
+    }
+};
+
+window.registrarPaciente = async () => {
+    const nombre = document.getElementById("reg-paciente-nombre").value.trim();
+    const apellido = document.getElementById("reg-paciente-apellido").value.trim();
+    const dni = document.getElementById("reg-paciente-dni").value.trim();
+    const celular = document.getElementById("reg-paciente-celular").value.trim();
+    const email = document.getElementById("reg-paciente-email").value.trim();
+    const id_obra_social = document.getElementById("reg-paciente-obra-social").value;
+    const password = document.getElementById("reg-paciente-password").value.trim();
+
+    if (!nombre || !apellido || !dni || !password || !id_obra_social) {
+        alert("Nombre, Apellido, DNI, Obra Social y Contraseña son obligatorios.");
+        return;
+    }
+
+    try {
+        const resp = await fetch('/api/registro-paciente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, apellido, dni, celular, email, password, id_obra_social })
+        });
+        const data = await resp.json();
+        if (resp.ok && data.success) {
+            alert("Registro exitoso. Ahora puede ingresar.");
+            document.getElementById("login-paciente-dni").value = dni;
+            document.getElementById("login-paciente-password").value = "";
+            irA("login-paciente");
+        } else {
+            alert(data.error || "Error en el registro.");
+        }
+    } catch (e) {
+        alert("Error de conexión.");
+    }
+};
+
+window.cerrarSesionPaciente = () => {
+    sessionStorage.removeItem('pacienteAuth');
+    window.irA('inicio');
+};
+
 export function intentarIngresoSecretaria() {
     const user = obtenerUsuarioLogueado();
     if (user) {

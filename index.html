@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>TurnoClinic - Gestión de Turnos Médicos</title> -->
-    <title>SmartClinic - Gestión de Turnos Médicos</title>
+    <title>TurnoClinic - Gestión de Turnos Médicos</title>
     <link rel="stylesheet" href="/src/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <header class="app-header">
-        <div class="container"
-            style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1.5rem;">
-            <h1 id="logo" style="margin: 0;">SmartClinic 🏥</h1>
-            <button id="btn-header-login" class="btn-secundario btn-sm"
-                style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; padding: 0.6rem 1.2rem; font-size: 0.95rem; border-radius: 0.75rem; font-weight: 600;">👤
-                Iniciar Sesión</button>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1.5rem;">
+            <h1 id="logo" style="margin: 0;">TurnoClinic 🏥</h1>
+            <button id="btn-header-login" class="btn-secundario btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; padding: 0.6rem 1.2rem; font-size: 0.95rem; border-radius: 0.75rem; font-weight: 600;">👤 Iniciar Sesión</button>
         </div>
     </header>
-
-    <!-- Versión del programa (editable por el usuario, mantenida para actualizaciones) -->
+    <!-- Versión del programa -->
     <div style="position: absolute; right: 1rem; bottom: 1rem; max-width: 900px; padding: 0 1.5rem;">
         <span class="version-programa"
-            style="font-size: 0.8rem; color: var(--color-texto-secundario);">v18.06.26_1701</span>
+            style="font-size: 0.8rem; color: var(--color-texto-secundario);">v24.6.26_0039</span>
     </div>
 
     <main class="container">
@@ -35,13 +28,10 @@
         <!-- ======================================= -->
         <div id="pantalla-inicio" class="pantalla activa">
             <div class="tarjeta-bienvenida" style="padding: 3.5rem 2rem; border-radius: 2rem;">
-                <h2>Bienvenido a SmartClinic</h2>
-                <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--color-texto-secundario);">Pida sus
-                    turnos de forma rápida y sencilla.</p>
+                <h2>Bienvenido a TurnoClinic</h2>
+                <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--color-texto-secundario);">Gestione sus turnos de forma rápida y sencilla.</p>
                 <div class="acciones-inicio" style="margin-top: 0; display: flex; justify-content: center;">
-                    <button id="btn-reservar-turno" class="btn-primario"
-                        style="font-size: 1.15rem; padding: 1rem 3rem; border-radius: 1rem; cursor: pointer; transition: all 0.3s ease;">📅
-                        Reservar un Turno</button>
+                    <button id="btn-reservar-turno" class="btn-primario" style="font-size: 1.15rem; padding: 1rem 3rem; border-radius: 1rem; cursor: pointer; transition: all 0.3s ease;">📅 Reservar un Turno</button>
                 </div>
             </div>
         </div>
@@ -64,10 +54,107 @@
                 <button class="btn-link btn-volver-inicio">Volver</button>
             </div>
         </div>
-
+        
         <!-- ======================================= -->
         <!-- PANTALLAS PACIENTE: RESERVA DE TURNO -->
         <!-- ======================================= -->
+        <div id="pantalla-login-paciente" class="pantalla">
+            <div class="tarjeta-form">
+                <h3>Acceso Pacientes</h3>
+                <div class="form-grupo">
+                    <label for="login-paciente-dni">DNI</label>
+                    <input type="text" id="login-paciente-dni" placeholder="Ej: 12345678">
+                </div>
+                <div class="form-grupo">
+                    <label for="login-paciente-password">Contraseña</label>
+                    <input type="password" id="login-paciente-password" placeholder="Su contraseña">
+                </div>
+                <button id="btn-login-paciente" class="btn-primario" onclick="window.loginPaciente()">Ingresar</button>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <button class="btn-link" onclick="window.irA('registro-paciente')">¿No tiene cuenta? Regístrese</button>
+                </div>
+                <button class="btn-link btn-volver-inicio" style="margin-top: 0.5rem;">Volver al Inicio</button>
+            </div>
+        </div>
+
+        <div id="pantalla-registro-paciente" class="pantalla">
+            <div class="tarjeta-form">
+                <h3>Registro de Paciente</h3>
+                <div class="form-grupo">
+                    <label>Nombre</label>
+                    <input type="text" id="reg-paciente-nombre" placeholder="Juan">
+                </div>
+                <div class="form-grupo">
+                    <label>Apellido</label>
+                    <input type="text" id="reg-paciente-apellido" placeholder="Pérez">
+                </div>
+                <div class="form-grupo">
+                    <label>DNI</label>
+                    <input type="text" id="reg-paciente-dni" placeholder="12345678">
+                </div>
+                <div class="form-grupo">
+                    <label>Celular</label>
+                    <input type="text" id="reg-paciente-celular" placeholder="1122334455">
+                </div>
+                <div class="form-grupo">
+                    <label>Email</label>
+                    <input type="email" id="reg-paciente-email" placeholder="juan@ejemplo.com">
+                </div>
+                <div class="form-grupo">
+                    <label>Obra Social</label>
+                    <select id="reg-paciente-obra-social"></select>
+                </div>
+                <div class="form-grupo">
+                    <label>Contraseña</label>
+                    <input type="password" id="reg-paciente-password" placeholder="Crear contraseña">
+                </div>
+                <button id="btn-registro-paciente" class="btn-primario" onclick="window.registrarPaciente()">Registrarse</button>
+                <button class="btn-link" onclick="window.irA('login-paciente')">Volver al Login</button>
+            </div>
+        </div>
+
+        <div id="pantalla-busqueda-dual" class="pantalla">
+            <div class="header-pantalla">
+                <h2>Búsqueda de Turnos</h2>
+                <div>
+                    <button class="btn-primario btn-sm" onclick="window.verMisTurnos()">Mis Turnos</button>
+                    <button class="btn-secundario btn-sm" onclick="window.cerrarSesionPaciente()">Cerrar Sesión</button>
+                </div>
+            </div>
+            <h3 style="margin-bottom: 1rem; text-align: center;">¿Cómo desea buscar su turno?</h3>
+            <div class="opciones-busqueda-dual" style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                <div class="tarjeta-opcion" style="cursor: pointer; padding: 2rem; border-radius: 1.5rem; background-color: var(--color-superficie); box-shadow: var(--sombra-suave); width: 250px; text-align: center; transition: all 0.2s;" onclick="window.iniciarBusquedaPorMedico()">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍⚕️</div>
+                    <h4>Buscar por Especialidad / Médico</h4>
+                    <p style="font-size: 0.9rem; color: var(--color-texto-secundario); margin-top: 0.5rem;">Elija primero la especialidad y luego el profesional</p>
+                </div>
+                <div class="tarjeta-opcion" style="cursor: pointer; padding: 2rem; border-radius: 1.5rem; background-color: var(--color-superficie); box-shadow: var(--sombra-suave); width: 250px; text-align: center; transition: all 0.2s;" onclick="window.iniciarBusquedaPorFecha()">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+                    <h4>Buscar por Fecha</h4>
+                    <p style="font-size: 0.9rem; color: var(--color-texto-secundario); margin-top: 0.5rem;">Elija el día y vea qué profesionales atienden</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn-secundario btn-cancelar">Cancelar Reserva</button>
+            </div>
+        </div>
+
+        <div id="pantalla-mis-turnos" class="pantalla">
+            <div class="header-pantalla">
+                <h2>Mis Turnos</h2>
+                <button class="btn-secundario" onclick="window.irA('busqueda-dual')">Volver</button>
+            </div>
+            <div id="lista-mis-turnos" class="tarjeta-lista"></div>
+        </div>
+
+        <div id="pantalla-fecha-profesionales" class="pantalla">
+            <h3 id="titulo-fecha-profesionales" style="margin-bottom: 1rem;">Profesionales disponibles el</h3>
+            <div id="contenedor-fecha-profesionales" class="grid-avatar"></div>
+            <div class="acciones-form">
+                <button class="btn-secundario btn-cancelar">Cancelar Reserva</button>
+            </div>
+        </div>
+
         <div id="pantalla-especialidades" class="pantalla">
             <h2>1. Elija una especialidad</h2>
             <div id="contenedor-especialidades" class="grid-avatar"></div>
@@ -92,7 +179,7 @@
             </div>
             <button class="btn-secundario btn-cancelar">Cancelar</button>
         </div>
-
+        
         <div id="pantalla-horarios" class="pantalla">
             <h2 id="titulo-fecha-elegida">4. Elija un horario</h2>
             <div id="contenedor-horarios" class="grid-horarios"></div>
@@ -100,37 +187,13 @@
         </div>
 
         <div id="pantalla-datos" class="pantalla">
-            <h2>5. Complete sus datos</h2>
+            <h2>5. Confirme su Turno</h2>
             <div class="tarjeta-form">
                 <h4>Resumen del Turno</h4>
                 <div id="resumen-turno"></div>
-                <h4>Datos del Paciente</h4>
-                <div class="form-grupo">
-                    <label for="datos-nombre">Nombre</label>
-                    <input type="text" id="datos-nombre" placeholder="Su nombre">
+                <div id="form-datos-paciente">
+                    <!-- Dynamic content filled by booking.js -->
                 </div>
-                <div class="form-grupo">
-                    <label for="datos-apellido">Apellido</label>
-                    <input type="text" id="datos-apellido" placeholder="Su apellido">
-                </div>
-                <div class="form-grupo">
-                    <label for="datos-dni">DNI</label>
-                    <input type="text" id="datos-dni" placeholder="Sin puntos">
-                </div>
-                <div class="form-grupo">
-                    <label for="datos-celular">Celular (Opcional)</label>
-                    <input type="tel" id="datos-celular" placeholder="1122334455">
-                </div>
-                <div class="form-grupo">
-                    <label for="datos-mail">Email (Opcional)</label>
-                    <input type="email" id="datos-mail" placeholder="sudireccion@email.com">
-                </div>
-                <div class="form-grupo">
-                    <label for="datos-obra-social">Obra Social</label>
-                    <select id="datos-obra-social"></select>
-                </div>
-                <button class="btn-primario" onclick="window.finalizarReserva()">Confirmar Turno</button>
-                <button class="btn-secundario btn-cancelar">Cancelar</button>
             </div>
         </div>
 
@@ -143,8 +206,7 @@
                 <p><strong>Fecha y Hora:</strong> <span id="conf-fecha"></span></p>
                 <p class="msg-recordatorio">Recibirá un recordatorio por email 24hs antes de su turno.</p>
                 <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
-                    <button onclick="window.print()" class="btn-secundario"><span
-                            style="margin-right: 0.5rem;">🖨️</span> Imprimir PDF</button>
+                    <button onclick="window.print()" class="btn-secundario"><span style="margin-right: 0.5rem;">🖨️</span> Imprimir PDF</button>
                     <button id="btn-conf-aceptar" class="btn-primario">Aceptar</button>
                 </div>
             </div>
@@ -160,25 +222,20 @@
             </div>
 
             <div class="grid-dashboard">
-                <div class="stat-card">
-                    <h4>Pacientes</h4><span id="dash-stat-pacientes">0</span>
-                </div>
-                <div class="stat-card">
-                    <h4>Profesionales</h4><span id="dash-stat-profesionales">0</span>
-                </div>
-                <div class="stat-card">
-                    <h4>Turnos para Hoy</h4><span id="dash-stat-turnos-hoy">0</span>
-                </div>
+                <div class="stat-card"><h4>Pacientes</h4><span id="dash-stat-pacientes">0</span></div>
+                <div class="stat-card"><h4>Profesionales</h4><span id="dash-stat-profesionales">0</span></div>
+                <div class="stat-card"><h4>Turnos para Hoy</h4><span id="dash-stat-turnos-hoy">0</span></div>
             </div>
 
             <div class="acciones-dashboard">
-                <button id="btn-dash-nuevo-turno" class="btn-accion-dash">➕ Nuevo Turno</button>
-                <button id="btn-dash-consultar" class="btn-accion-dash">🗓️ Consultar Turnos</button>
-                <button id="btn-dash-pacientes" class="btn-accion-dash">👥 Gestionar Pacientes</button>
-                <button id="btn-dash-profesionales" class="btn-accion-dash">👨‍⚕️ Gestionar Profesionales</button>
-                <button id="btn-dash-agendas" class="btn-accion-dash">⚙️ Configurar Agendas</button>
-                <button id="btn-dash-obras-sociales" class="btn-accion-dash">🏥 Obras Sociales</button>
-                <button id="btn-dash-especialidades" class="btn-accion-dash">🔬 Especialidades</button>
+                 <button id="btn-dash-nuevo-turno" class="btn-accion-dash">➕ Nuevo Turno</button>
+                 <button id="btn-dash-consultar" class="btn-accion-dash">🗓️ Consultar Turnos</button>
+                 <button id="btn-dash-pacientes" class="btn-accion-dash">👥 Gestionar Pacientes</button>
+                 <button id="btn-dash-profesionales" class="btn-accion-dash">👨‍⚕️ Gestionar Profesionales</button>
+                 <button id="btn-dash-agendas" class="btn-accion-dash">⚙️ Configurar Agendas</button>
+                  <button id="btn-dash-obras-sociales" class="btn-accion-dash">🏥 Obras Sociales</button>
+                  <button id="btn-dash-especialidades" class="btn-accion-dash">🔬 Especialidades</button>
+                  <button id="btn-dash-secretarias" class="btn-accion-dash admin-only">👩‍💼 Gestionar Secretarias</button>
             </div>
 
             <div class="tarjeta-lista">
@@ -195,13 +252,12 @@
             </div>
             <div class="header-acciones" style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <button id="btn-nuevo-paciente" class="btn-primario">+ Nuevo Paciente</button>
-                <input type="text" id="buscar-paciente-admin" placeholder="Buscar por DNI o Apellido..."
-                    class="input-form" style="max-width: 300px;">
+                <input type="text" id="buscar-paciente-admin" placeholder="Buscar por DNI o Apellido..." class="input-form" style="max-width: 300px;">
             </div>
             <div id="form-paciente-container" class="tarjeta-form" style="display: none;">
                 <h3 id="paciente-form-titulo"></h3>
                 <form id="form-gestion-paciente">
-                    <div class="form-grid-2">
+                     <div class="form-grid-2">
                         <div class="form-grupo"><label>Nombre</label><input type="text" id="pac-nombre"></div>
                         <div class="form-grupo"><label>Apellido</label><input type="text" id="pac-apellido"></div>
                         <div class="form-grupo"><label>DNI</label><input type="text" id="pac-dni"></div>
@@ -214,18 +270,8 @@
                 </form>
             </div>
             <div class="tabla-wrapper">
-                <table class="tabla-moderna">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Paciente</th>
-                            <th>DNI</th>
-                            <th>Celular</th>
-                            <th>Mail</th>
-                            <th>Obra Social</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+                 <table class="tabla-moderna">
+                    <thead><tr><th>ID</th><th>Paciente</th><th>DNI</th><th>Celular</th><th>Mail</th><th>Obra Social</th><th>Acciones</th></tr></thead>
                     <tbody id="tabla-pacientes-body"></tbody>
                 </table>
             </div>
@@ -233,25 +279,22 @@
 
         <!-- PANTALLA GESTION PROFESIONALES -->
         <div id="pantalla-gestion-profesionales" class="pantalla">
-            <div class="header-pantalla">
+             <div class="header-pantalla">
                 <h2>Gestión de Profesionales</h2>
                 <button class="btn-secundario btn-volver-dash">Volver</button>
             </div>
             <div class="header-acciones" style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <button id="btn-agregar-profesional" class="btn-primario">+ Agregar Profesional</button>
-                <input type="text" id="buscar-profesional-admin" placeholder="Buscar por DNI o Apellido..."
-                    class="input-form" style="max-width: 300px;">
+                <input type="text" id="buscar-profesional-admin" placeholder="Buscar por DNI o Apellido..." class="input-form" style="max-width: 300px;">
             </div>
             <div id="form-agregar-profesional" class="tarjeta-form" style="display:none;">
-                <h3 id="prof-form-titulo">➕ Nuevo Profesional</h3>
+                 <h3 id="prof-form-titulo">➕ Nuevo Profesional</h3>
                 <form id="form-agregar-profesional-form">
                     <div class="form-grid-2">
                         <div class="form-grupo"><label>Nombre</label><input type="text" id="nuevo-prof-nombre"></div>
-                        <div class="form-grupo"><label>Apellido</label><input type="text" id="nuevo-prof-apellido">
-                        </div>
+                        <div class="form-grupo"><label>Apellido</label><input type="text" id="nuevo-prof-apellido"></div>
                         <div class="form-grupo"><label>DNI</label><input type="text" id="nuevo-prof-dni"></div>
-                        <div class="form-grupo"><label>Especialidad</label><select
-                                id="nuevo-prof-especialidad"></select></div>
+                        <div class="form-grupo"><label>Especialidad</label><select id="nuevo-prof-especialidad"></select></div>
                         <div class="form-grupo"><label>Celular</label><input type="text" id="nuevo-prof-celular"></div>
                         <div class="form-grupo"><label>Mail</label><input type="email" id="nuevo-prof-mail"></div>
                     </div>
@@ -264,14 +307,12 @@
 
         <!-- PANTALLA CONFIGURAR AGENDA -->
         <div id="pantalla-agenda" class="pantalla">
-            <div class="header-pantalla">
-                <h2>Configuración de Agendas</h2><button class="btn-secundario btn-volver-dash">Volver</button>
-            </div>
+            <div class="header-pantalla"><h2>Configuración de Agendas</h2><button class="btn-secundario btn-volver-dash">Volver</button></div>
             <div class="form-grupo">
                 <label for="agenda-profesional">Seleccione un profesional para configurar su agenda:</label>
                 <select id="agenda-profesional"></select>
             </div>
-
+            
             <div class="agenda-config-container">
                 <!-- Columna Días -->
                 <div id="agenda-dias-seccion" class="tarjeta-form">
@@ -293,15 +334,31 @@
                 <!-- Columna Horarios -->
                 <div id="agenda-horarios-seccion" class="tarjeta-form">
                     <h4>2. Horarios de Atención</h4>
-                    <p class="ayuda-texto">Seleccione los horarios en que el profesional estará disponible.</p>
+                    <p class="ayuda-texto">Configure el rango de horas y la duración de cada turno para generar los horarios, o seleccione manualmente.</p>
+                    
+                    <div style="display:flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: flex-end;">
+                        <div class="form-grupo" style="margin-bottom:0; flex:1; min-width:100px;">
+                            <label>Inicio</label>
+                            <input type="time" id="agenda-hora-inicio" value="08:00">
+                        </div>
+                        <div class="form-grupo" style="margin-bottom:0; flex:1; min-width:100px;">
+                            <label>Fin</label>
+                            <input type="time" id="agenda-hora-fin" value="18:00">
+                        </div>
+                        <div class="form-grupo" style="margin-bottom:0; flex:1; min-width:100px;">
+                            <label>Duración (min)</label>
+                            <input type="number" id="agenda-duracion" value="30" min="5" step="5">
+                        </div>
+                        <button class="btn-secundario btn-sm" onclick="window.generarHorariosDinamicos()" style="margin-bottom: 3px;">Generar</button>
+                    </div>
+
                     <div id="grilla-horarios-checkbox" class="grid-horarios"></div>
                     <div class="acciones-form">
-                        <button class="btn-sm" onclick="limpiarSeleccionHorarios()">Limpiar todo</button>
-                        <button class="btn-sm btn-primario" onclick="guardarHorariosSeleccionados()">Guardar
-                            Horarios</button>
+                        <button class="btn-sm" onclick="window.limpiarSeleccionHorarios()">Limpiar todo</button>
+                        <button class="btn-sm btn-primario" onclick="window.guardarHorariosSeleccionados()">Guardar Horarios</button>
                     </div>
                 </div>
-
+                
                 <!-- Columna Resumen -->
                 <div id="agenda-resumen-seccion" class="tarjeta-form">
                     <h4>Resumen de Agenda</h4>
@@ -313,12 +370,10 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- PANTALLA CONSULTA DE TURNOS (ADMIN) -->
         <div id="pantalla-consulta-turnos" class="pantalla">
-            <div class="header-pantalla">
-                <h2>Consulta de Turnos</h2><button class="btn-secundario btn-volver-dash">Volver</button>
-            </div>
+            <div class="header-pantalla"><h2>Consulta de Turnos</h2><button class="btn-secundario btn-volver-dash">Volver</button></div>
             <div class="calendario-header">
                 <button class="btn-accion" onclick="changeMonth(-1, 'consulta')">◀</button>
                 <h3 id="consulta-mes-titulo"></h3>
@@ -329,10 +384,7 @@
 
         <!-- PANTALLA MODIFICAR TURNO (ADMIN) -->
         <div id="pantalla-gestion-turno" class="pantalla">
-            <div class="header-pantalla">
-                <h2>Reprogramar / Cancelar Turno</h2><button class="btn-secundario"
-                    onclick="irA('consulta-turnos')">Volver</button>
-            </div>
+            <div class="header-pantalla"><h2>Reprogramar / Cancelar Turno</h2><button class="btn-secundario" onclick="irA('consulta-turnos')">Volver</button></div>
             <div class="info-turno-original">
                 <p><strong>Turno ID:</strong> <span id="mod-turno-id"></span></p>
                 <p><strong>Paciente:</strong> <span id="mod-turno-paciente"></span></p>
@@ -340,21 +392,16 @@
                 <p><strong>Fecha y Hora:</strong> <span id="mod-turno-fecha-hora"></span></p>
             </div>
             <div class="tarjeta-form">
-                <h4>Reprogramar Turno</h4>
-                <p class="ayuda-texto">Seleccione una nueva fecha y horario para el turno.</p>
-                <div class="reprogramar-grid">
-                    <div class="calendario-container">
-                        <div class="calendario-header">
-                            <button class="btn-accion" onclick="changeMonth(-1, 'gestion-turno')">◀</button>
-                            <h3 class="calendario-titulo-texto"></h3>
-                            <button class="btn-accion" onclick="changeMonth(1, 'gestion-turno')">▶</button>
-                        </div>
-                        <div id="mod-calendario-container" class="calendario-grid"></div>
-                    </div>
-                    <div id="mod-horarios-container" class="grid-horarios"></div>
+                <h4>Reprogramar Turno (Drag & Drop)</h4>
+                <p class="ayuda-texto">Arrastre el turno actual a un horario libre, o cambie la fecha para buscar otros horarios.</p>
+                <div class="filtros-grilla" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                    <label for="mod-fecha-grilla">Fecha:</label>
+                    <input type="date" id="mod-fecha-grilla" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--color-borde);">
                 </div>
-                <div class="acciones-form">
-                    <button class="btn-primario" onclick="guardarCambiosTurno()">Guardar Cambios</button>
+                <div id="mod-grilla-diaria-container" style="display:flex; flex-direction: column; gap: 0.5rem;"></div>
+                
+                <div class="acciones-form" style="margin-top: 1.5rem;">
+                    <button class="btn-primario" onclick="guardarCambiosTurno()" style="display: none;" id="btn-guardar-reprogramacion">Guardar Reprogramación</button>
                 </div>
             </div>
             <div class="tarjeta-form zona-peligro">
@@ -366,9 +413,7 @@
 
         <!-- PANTALLA CREAR TURNO (SECRETARIA) -->
         <div id="pantalla-secretaria-crear" class="pantalla">
-            <div class="header-pantalla">
-                <h2>Crear Nuevo Turno</h2><button class="btn-secundario btn-volver-dash">Volver</button>
-            </div>
+            <div class="header-pantalla"><h2>Crear Nuevo Turno</h2><button class="btn-secundario btn-volver-dash">Volver</button></div>
 
             <!-- 1. Buscar o crear paciente -->
             <div class="tarjeta-form">
@@ -386,8 +431,7 @@
                         <div class="form-grupo"><label>DNI</label><input disabled type="text" id="sec-dni-nuevo"></div>
                         <div class="form-grupo"><label>Celular</label><input type="text" id="sec-celular"></div>
                         <div class="form-grupo"><label>Mail</label><input type="email" id="sec-mail"></div>
-                        <div class="form-grupo"><label>Obra Social</label><select id="sec-obra-social-nuevo"></select>
-                        </div>
+                        <div class="form-grupo"><label>Obra Social</label><select id="sec-obra-social-nuevo"></select></div>
                     </div>
                     <button class="btn-primario" onclick="window.crearPacienteSecretaria()">Crear y Continuar</button>
                     <button class="btn-secundario" onclick="window.ocultarFormCrearPaciente()">Cancelar</button>
@@ -427,9 +471,8 @@
                     <h5>Horarios Disponibles</h5>
                     <div id="sec-grilla-horarios" class="grid-horarios"></div>
                 </div>
-
-                <button class="btn-primario" style="margin-top: 1.5rem;" onclick="guardarTurnoSecretaria()">Confirmar y
-                    Guardar Turno</button>
+                
+                <button class="btn-primario" style="margin-top: 1.5rem;" onclick="guardarTurnoSecretaria()">Confirmar y Guardar Turno</button>
             </div>
         </div>
 
@@ -439,19 +482,16 @@
                 <h2>Gestión de Obras Sociales</h2>
                 <button class="btn-secundario btn-volver-dash">Volver</button>
             </div>
-
+            
             <div class="form-grupo" style="margin-bottom: 1.5rem;">
-                <input type="text" id="buscar-os-admin" placeholder="🔍 Buscar obra social por nombre..."
-                    style="width: 100%; max-width: 400px; padding: 0.75rem;">
+                <input type="text" id="buscar-os-admin" placeholder="🔍 Buscar obra social por nombre..." style="width: 100%; max-width: 400px; padding: 0.75rem;">
             </div>
 
             <div class="grid-form-y-lista">
                 <div class="tarjeta-form">
-                    <button id="btn-agregar-os" class="btn-primario" style="margin-bottom: 1rem; width: 100%;">➕ Nueva
-                        Obra Social</button>
-
-                    <div id="form-gestion-os"
-                        style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; margin-top: 1rem;">
+                    <button id="btn-agregar-os" class="btn-primario" style="margin-bottom: 1rem; width: 100%;">➕ Nueva Obra Social</button>
+                    
+                    <div id="form-gestion-os" style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; margin-top: 1rem;">
                         <h4 id="os-form-titulo">➕ Nueva Obra Social</h4>
                         <form id="form-os-form">
                             <div class="form-grupo">
@@ -460,8 +500,7 @@
                             </div>
                             <div class="acciones-form" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
                                 <button type="submit" class="btn-primario" style="flex: 1;">Guardar</button>
-                                <button type="button" id="btn-cancelar-os" class="btn-secundario"
-                                    style="flex: 1;">Cancelar</button>
+                                <button type="button" id="btn-cancelar-os" class="btn-secundario" style="flex: 1;">Cancelar</button>
                             </div>
                         </form>
                     </div>
@@ -491,35 +530,29 @@
                 <h2>Gestión de Especialidades</h2>
                 <button class="btn-secundario btn-volver-dash">Volver</button>
             </div>
-
+            
             <div class="form-grupo" style="margin-bottom: 1.5rem;">
-                <input type="text" id="buscar-esp-admin" placeholder="🔍 Buscar especialidad por nombre..."
-                    style="width: 100%; max-width: 400px; padding: 0.75rem;">
+                <input type="text" id="buscar-esp-admin" placeholder="🔍 Buscar especialidad por nombre..." style="width: 100%; max-width: 400px; padding: 0.75rem;">
             </div>
 
             <div class="grid-form-y-lista">
                 <div class="tarjeta-form">
-                    <button id="btn-agregar-esp" class="btn-primario" style="margin-bottom: 1rem; width: 100%;">➕ Nueva
-                        Especialidad</button>
-
-                    <div id="form-gestion-esp"
-                        style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; margin-top: 1rem;">
+                    <button id="btn-agregar-esp" class="btn-primario" style="margin-bottom: 1rem; width: 100%;">➕ Nueva Especialidad</button>
+                    
+                    <div id="form-gestion-esp" style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; margin-top: 1rem;">
                         <h4 id="esp-form-titulo">➕ Nueva Especialidad</h4>
                         <form id="form-esp-form">
                             <div class="form-grupo">
                                 <label for="esp-nombre-input">Nombre</label>
-                                <input type="text" id="esp-nombre-input" required
-                                    placeholder="Ej: Cardiología, Pediatría">
+                                <input type="text" id="esp-nombre-input" required placeholder="Ej: Cardiología, Pediatría">
                             </div>
                             <div class="form-grupo" style="margin-top: 0.5rem;">
                                 <label for="esp-icono-input">Ícono / Emoji</label>
-                                <input type="text" id="esp-icono-input" required value="🩺"
-                                    style="font-size: 1.25rem; text-align: center;">
+                                <input type="text" id="esp-icono-input" required value="🩺" style="font-size: 1.25rem; text-align: center;">
                             </div>
                             <div class="acciones-form" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
                                 <button type="submit" class="btn-primario" style="flex: 1;">Guardar</button>
-                                <button type="button" id="btn-cancelar-esp" class="btn-secundario"
-                                    style="flex: 1;">Cancelar</button>
+                                <button type="button" id="btn-cancelar-esp" class="btn-secundario" style="flex: 1;">Cancelar</button>
                             </div>
                         </form>
                     </div>
@@ -549,19 +582,15 @@
             <div class="header-pantalla">
                 <div>
                     <h2 id="prof-nombre-display">Dr/a. Médico</h2>
-                    <p style="color: var(--color-texto-secundario); font-size: 0.9rem;">Historial mensual de turnos
-                        asignados</p>
+                    <p style="color: var(--color-texto-secundario); font-size: 0.9rem;">Historial mensual de turnos asignados</p>
                 </div>
-                <button id="btn-prof-logout" class="btn-rojo-sm btn-logout"
-                    style="font-size: 0.95rem; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600;">Cerrar
-                    Sesión</button>
+                <button id="btn-prof-logout" class="btn-rojo-sm btn-logout" style="font-size: 0.95rem; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600;">Cerrar Sesión</button>
             </div>
 
             <div class="tarjeta-lista" style="margin-top: 1.5rem;">
                 <div class="calendario-header" style="justify-content: center; gap: 2rem; margin-bottom: 1.5rem;">
                     <button class="btn-accion" onclick="changeMonth(-1, 'profesional')">◀</button>
-                    <h3 id="prof-mes-titulo" class="calendario-titulo-texto"
-                        style="margin: 0; min-width: 200px; text-align: center;">-</h3>
+                    <h3 id="prof-mes-titulo" class="calendario-titulo-texto" style="margin: 0; min-width: 200px; text-align: center;">-</h3>
                     <button class="btn-accion" onclick="changeMonth(1, 'profesional')">▶</button>
                 </div>
 
@@ -584,9 +613,39 @@
             </div>
         </div>
 
+        <!-- PANTALLA GESTION SECRETARIAS -->
+        <div id="pantalla-gestion-secretarias" class="pantalla">
+            <div class="header-pantalla">
+                <h2>Gestión de Secretarias</h2>
+                <button class="btn-secundario btn-volver-dash">Volver</button>
+            </div>
+            
+            <div class="tarjeta-form">
+                <h4 id="secretaria-form-titulo">➕ Nueva Secretaria</h4>
+                <form id="form-gestion-secretaria">
+                    <div class="grid-form">
+                        <div class="form-grupo"><label>Nombre</label><input type="text" id="sec-nombre" required></div>
+                        <div class="form-grupo"><label>Apellido</label><input type="text" id="sec-apellido" required></div>
+                        <div class="form-grupo"><label>DNI / Usuario</label><input type="text" id="sec-dni" required></div>
+                        <div class="form-grupo"><label>Contraseña</label><input type="password" id="sec-password" placeholder="Dejar en blanco para no cambiar"></div>
+                        <div class="form-grupo">
+                            <label>Estado</label>
+                            <select id="sec-estado">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primario">Guardar</button>
+                    <button type="button" id="btn-cancelar-sec" class="btn-secundario">Cancelar</button>
+                </form>
+            </div>
+
+            <div id="lista-secretarias" class="tarjeta-lista"></div>
+        </div>
+
     </main>
 
     <script src="/src/js/main.js" type="module"></script>
 </body>
-
 </html>

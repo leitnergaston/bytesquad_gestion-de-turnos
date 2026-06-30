@@ -64,6 +64,13 @@ export async function inicializarConfigAgenda() {
         
         seleccionHorariosTemp = horariosGlobales.length > 0 ? [...new Set(horariosGlobales)] : [...horariosBD];
         
+        // Ensure horariosGenerados contains all the loaded times
+        if (horariosGlobales.length > 0) {
+            horariosGenerados = [...seleccionHorariosTemp].sort();
+        } else {
+            horariosGenerados = [...horariosBD];
+        }
+        
         diasSeccion.style.display = "block";
         horariosSeccion.style.display = "block";
         resumenSeccion.style.display = "block";
@@ -143,9 +150,45 @@ window.guardarDiasSeleccionados = async () => {
     }
 }
 
+let horariosGenerados = [...horariosBD]; // Initially fallback to BD ones or could be empty.
+
+window.generarHorariosDinamicos = () => {
+    const inicio = document.getElementById("agenda-hora-inicio").value;
+    const fin = document.getElementById("agenda-hora-fin").value;
+    const duracion = parseInt(document.getElementById("agenda-duracion").value, 10);
+    
+    if(!inicio || !fin || !duracion || duracion <= 0) {
+        alert("Por favor ingrese inicio, fin y duración válidos.");
+        return;
+    }
+
+    const [hInicio, mInicio] = inicio.split(':').map(Number);
+    const [hFin, mFin] = fin.split(':').map(Number);
+    
+    let currentMin = hInicio * 60 + mInicio;
+    const endMin = hFin * 60 + mFin;
+    
+    if(currentMin >= endMin) {
+        alert("La hora de inicio debe ser anterior a la hora de fin.");
+        return;
+    }
+
+    const nuevosHorarios = [];
+    while (currentMin + duracion <= endMin) {
+        const hh = Math.floor(currentMin / 60).toString().padStart(2, '0');
+        const mm = (currentMin % 60).toString().padStart(2, '0');
+        nuevosHorarios.push(`${hh}:${mm}`);
+        currentMin += duracion;
+    }
+    
+    horariosGenerados = nuevosHorarios;
+    seleccionHorariosTemp = [...horariosGenerados];
+    renderizarGrillaHorariosCheckbox();
+}
+
 function renderizarGrillaHorariosCheckbox() {
     const contenedor = document.getElementById("grilla-horarios-checkbox");
-    contenedor.innerHTML = horariosBD.map(hora => {
+    contenedor.innerHTML = horariosGenerados.map(hora => {
         const isSelected = seleccionHorariosTemp.includes(hora);
         return `
             <label class="horario-checkbox ${isSelected ? 'seleccionado' : ''}">

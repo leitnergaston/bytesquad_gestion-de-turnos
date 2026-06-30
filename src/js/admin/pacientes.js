@@ -1,5 +1,6 @@
 import { irA } from '../navigation.js';
 import { poblarSelect } from '../utils.js';
+import { obtenerUsuarioLogueado } from '../auth.js';
 
 let currentPacienteId = null;
 let pacientesCache = [];
@@ -57,6 +58,9 @@ function renderizarListaPacientes(filtro = '') {
         return full.includes(term) || dni.includes(term);
     });
 
+    const user = obtenerUsuarioLogueado();
+    const isAdmin = user && user.id_rol === 1;
+
     tbody.innerHTML = filtrados.map(p => {
         return `
             <tr>
@@ -68,7 +72,7 @@ function renderizarListaPacientes(filtro = '') {
                 <td>${p.obra_social_nombre || 'Particular'}</td>
                 <td class="acciones">
                     <button class="btn-accion-sm" onclick="window.prepararEdicionPaciente(${p.id_paciente})">✏️</button>
-                    <button class="btn-accion-sm btn-rojo-sm" onclick="window.eliminarPaciente(${p.id_paciente})">🗑️</button>
+                    ${isAdmin ? `<button class="btn-accion-sm btn-rojo-sm" onclick="window.eliminarPaciente(${p.id_paciente})">🗑️</button>` : ''}
                 </td>
             </tr>
         `;

@@ -27,6 +27,21 @@ async function startServer() {
     });
     console.log("Conexión MySQL configurada.");
 
+    // DB Migrations for new features
+    try {
+      await db.query(`
+          CREATE TABLE IF NOT EXISTS Secretaria (
+              id_secretaria INT AUTO_INCREMENT PRIMARY KEY,
+              dni VARCHAR(20) UNIQUE NOT NULL,
+              nombre VARCHAR(100) NOT NULL,
+              apellido VARCHAR(100) NOT NULL,
+              estado ENUM('activo', 'inactivo') DEFAULT 'activo'
+          );
+      `);
+      await db.query("ALTER TABLE Usuario ADD COLUMN id_secretaria INT DEFAULT NULL;");
+      await db.query("ALTER TABLE Usuario ADD FOREIGN KEY (id_secretaria) REFERENCES Secretaria(id_secretaria) ON DELETE CASCADE;");
+    } catch(e) {}
+
     // Auto-Migración y Configuración del esquema de la Base de Datos al iniciar
     setTimeout(async () => {
       try {
@@ -49,14 +64,16 @@ async function startServer() {
                 password VARCHAR(255) NOT NULL,
                 id_rol INT NOT NULL,
                 id_profesional INT DEFAULT NULL,
+                id_paciente INT DEFAULT NULL,
                 FOREIGN KEY (id_rol) REFERENCES Rol(id_rol),
-                FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE
+                FOREIGN KEY (id_profesional) REFERENCES Profesional(id_profesional) ON DELETE CASCADE,
+                FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente) ON DELETE CASCADE
             )
           `);
 
-          // Verificar si ya existía la tabla Usuario pero sin la columna id_profesional
-          const [columns] = await connCheck.query("SHOW COLUMNS FROM Usuario LIKE 'id_profesional'");
-          if (columns.length === 0) {
+          // Verificar si ya existía la tabla Usuario pero sin la columna id_profesional o id_paciente
+          const [columnsProf] = await connCheck.query("SHOW COLUMNS FROM Usuario LIKE 'id_profesional'");
+          if (columnsProf.length === 0) {
             console.log("La tabla Usuario existe pero no tiene 'id_profesional'. Agregando columna...");
             await connCheck.query("ALTER TABLE Usuario ADD COLUMN id_profesional INT DEFAULT NULL");
             try {
@@ -66,8 +83,22 @@ async function startServer() {
             }
           }
 
+          const [columnsPac] = await connCheck.query("SHOW COLUMNS FROM Usuario LIKE 'id_paciente'");
+          if (columnsPac.length === 0) {
+            console.log("La tabla Usuario existe pero no tiene 'id_paciente'. Agregando columna...");
+            await connCheck.query("ALTER TABLE Usuario ADD COLUMN id_paciente INT DEFAULT NULL");
+            try {
+              await connCheck.query("ALTER TABLE Usuario ADD FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente) ON DELETE CASCADE");
+            } catch (fkErr) {
+              console.log("Nota al agregar FK de id_paciente: ", fkErr.message);
+            }
+          }
+
+          // Asegurar que exista al menos una Obra Social (Particular)
+          await connCheck.query("INSERT IGNORE INTO Obra_Social (id_obra_social, nombre) VALUES (1, 'Particular')");
+
           // Asegurar que el seed de roles esté completo
-          await connCheck.query("INSERT IGNORE INTO Rol (id_rol, nombre_rol) VALUES (1, 'Administrador'), (2, 'Secretaria'), (3, 'Profesional')");
+          await connCheck.query("INSERT IGNORE INTO Rol (id_rol, nombre_rol) VALUES (1, 'Administrador'), (2, 'Secretaria'), (3, 'Profesional'), (4, 'Paciente')");
           // Renombrar 'Medico' a 'Profesional' si existía
           await connCheck.query("UPDATE Rol SET nombre_rol = 'Profesional' WHERE id_rol = 3");
 
@@ -445,21 +476,34 @@ async function startServer() {
       const { paciente, id_profesional, fecha, hora } = req.body;
       
       let id_paciente;
-      // Buscar paciente por DNI
-      const [pacRows] = await connection.query("SELECT id_paciente FROM Paciente WHERE dni = ?", [paciente.dni]);
-      if (pacRows.length > 0) {
-        id_paciente = pacRows[0].id_paciente;
-        // Opcional: actualizar datos del paciente si cambiaron
-        await connection.query(
-          "UPDATE Paciente SET nombre=?, apellido=?, celular=?, email=?, id_obra_social=? WHERE id_paciente = ?",
-          [paciente.nombre, paciente.apellido, paciente.celular, paciente.email, paciente.id_obra_social, id_paciente]
-        );
+      if (paciente.id_paciente) {
+        id_paciente = paciente.id_paciente;
+        if (!paciente.id_obra_social) {
+           const [pacData] = await connection.query("SELECT id_obra_social FROM Paciente WHERE id_paciente = ?", [id_paciente]);
+           if(pacData.length > 0) {
+               paciente.id_obra_social = pacData[0].id_obra_social;
+           }
+        } else {
+            await connection.query("UPDATE Paciente SET id_obra_social = ? WHERE id_paciente = ?", [paciente.id_obra_social, id_paciente]);
+        }
       } else {
-        const [result] = await connection.query(
-          "INSERT INTO Paciente (dni, nombre, apellido, celular, email, id_obra_social) VALUES (?, ?, ?, ?, ?, ?)",
-          [paciente.dni, paciente.nombre, paciente.apellido, paciente.celular, paciente.email, paciente.id_obra_social]
-        );
-        id_paciente = result.insertId;
+        // Buscar paciente por DNI
+        const [pacRows] = await connection.query("SELECT id_paciente FROM Paciente WHERE dni = ?", [paciente.dni]);
+        if (pacRows.length > 0) {
+          id_paciente = pacRows[0].id_paciente;
+          // Opcional: actualizar datos del paciente si cambiaron
+          await connection.query(
+            "UPDATE Paciente SET nombre=?, apellido=?, celular=?, email=?, id_obra_social=? WHERE id_paciente = ?",
+            [paciente.nombre, paciente.apellido, paciente.celular, paciente.email, paciente.id_obra_social, id_paciente]
+          );
+        } else {
+          await connection.query("INSERT IGNORE INTO Obra_Social (id_obra_social, nombre) VALUES (1, 'Particular')");
+          const [result] = await connection.query(
+            "INSERT INTO Paciente (dni, nombre, apellido, celular, email, id_obra_social) VALUES (?, ?, ?, ?, ?, ?)",
+            [paciente.dni, paciente.nombre, paciente.apellido, paciente.celular, paciente.email, paciente.id_obra_social || 1]
+          );
+          id_paciente = result.insertId;
+        }
       }
 
       // Eliminar turno cancelado anterior en el mismo horario si existe para evitar violación de UNIQUE
@@ -470,7 +514,7 @@ async function startServer() {
 
       const [resTurno] = await connection.query(
         "INSERT INTO Turno (fecha, hora, estado, id_paciente, id_profesional, id_obra_social) VALUES (?, ?, 'confirmado', ?, ?, ?)",
-        [fecha, hora, id_paciente, id_profesional, paciente.id_obra_social]
+        [fecha, hora, id_paciente, id_profesional, paciente.id_obra_social || 1]
       );
       
       await connection.commit();
@@ -529,18 +573,145 @@ async function startServer() {
   });
 
   // ============================================
+  // REGISTRO PACIENTE
+  // ============================================
+  app.post("/api/registro-paciente", async (req, res) => {
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+      const { dni, nombre, apellido, celular, email, password, id_obra_social } = req.body;
+      const id_os = id_obra_social ? parseInt(id_obra_social, 10) : 1;
+      
+      // Chequear si existe el dni
+      const [pacExists] = await conn.query("SELECT * FROM Paciente WHERE dni = ?", [dni]);
+      let id_paciente;
+      if (pacExists.length > 0) {
+        id_paciente = pacExists[0].id_paciente;
+        await conn.query("UPDATE Paciente SET nombre=?, apellido=?, celular=?, email=?, id_obra_social=? WHERE id_paciente=?", [nombre, apellido, celular, email, id_os, id_paciente]);
+      } else {
+        // Para pacientes particulares, asegurar que exista la obra social 1
+        await conn.query("INSERT IGNORE INTO Obra_Social (id_obra_social, nombre) VALUES (1, 'Particular')");
+        
+        const [resultPac] = await conn.query(
+          "INSERT INTO Paciente (dni, nombre, apellido, celular, email, id_obra_social) VALUES (?, ?, ?, ?, ?, ?)",
+          [dni, nombre, apellido, celular, email, id_os]
+        );
+        id_paciente = resultPac.insertId;
+      }
+
+      // Asegurarse de que el rol de paciente (4) exista
+      await conn.query("INSERT IGNORE INTO Rol (id_rol, nombre_rol) VALUES (4, 'Paciente')");
+
+      // Crear usuario
+      const [uExists] = await conn.query("SELECT * FROM Usuario WHERE username = ?", [dni]);
+      if (uExists.length > 0) {
+        throw new Error("El DNI ya se encuentra registrado.");
+      }
+
+      const [resU] = await conn.query(
+        "INSERT INTO Usuario (username, password, id_rol, id_paciente) VALUES (?, ?, ?, ?)",
+        [dni, password, 4, id_paciente] // 4 = Paciente
+      );
+
+      await conn.commit();
+      res.json({ success: true, id_paciente });
+    } catch (error) {
+      await conn.rollback();
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    } finally {
+      conn.release();
+    }
+  });
+
+  // ============================================
+  // SECRETARIAS
+  // ============================================
+  app.get("/api/secretarias", async (req, res) => {
+    try {
+      const [rows] = await db.query("SELECT * FROM Secretaria ORDER BY apellido, nombre");
+      res.json(rows);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/secretarias", async (req, res) => {
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+      const { dni, nombre, apellido, estado, password } = req.body;
+      
+      const [uExists] = await conn.query("SELECT * FROM Usuario WHERE username = ?", [dni]);
+      if (uExists.length > 0) throw new Error("El DNI/Usuario ya existe.");
+
+      const [resSec] = await conn.query(
+        "INSERT INTO Secretaria (dni, nombre, apellido, estado) VALUES (?, ?, ?, ?)",
+        [dni, nombre, apellido, estado || 'activo']
+      );
+      
+      await conn.query(
+        "INSERT INTO Usuario (username, password, id_rol, id_secretaria) VALUES (?, ?, ?, ?)",
+        [dni, password, 2, resSec.insertId] // 2 = Secretaria
+      );
+
+      await conn.commit();
+      res.json({ success: true, id_secretaria: resSec.insertId });
+    } catch (error) {
+      await conn.rollback();
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    } finally {
+      conn.release();
+    }
+  });
+
+  app.put("/api/secretarias/:id", async (req, res) => {
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+      const { id } = req.params;
+      const { dni, nombre, apellido, estado, password } = req.body;
+      
+      await conn.query(
+        "UPDATE Secretaria SET dni=?, nombre=?, apellido=?, estado=? WHERE id_secretaria=?",
+        [dni, nombre, apellido, estado, id]
+      );
+
+      if (password) {
+        await conn.query("UPDATE Usuario SET password=?, username=? WHERE id_secretaria=?", [password, dni, id]);
+      } else {
+        await conn.query("UPDATE Usuario SET username=? WHERE id_secretaria=?", [dni, id]);
+      }
+
+      await conn.commit();
+      res.json({ success: true });
+    } catch (error) {
+      await conn.rollback();
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    } finally {
+      conn.release();
+    }
+  });
+
+  // ============================================
   // AUTENTICACIÓN REAL
   // ============================================
   app.post("/api/login", async (req, res) => {
     try {
       const { username, password } = req.body;
       const query = `
-        SELECT u.id_usuario, u.username, u.password, u.id_rol, u.id_profesional,
+        SELECT u.id_usuario, u.username, u.password, u.id_rol, u.id_profesional, u.id_paciente,
                r.nombre_rol,
-               p.nombre AS prof_nombre, p.apellido AS prof_apellido
+               p.nombre AS prof_nombre, p.apellido AS prof_apellido,
+               pac.nombre AS pac_nombre, pac.apellido AS pac_apellido,
+               pac.celular AS pac_celular, pac.email AS pac_email
         FROM Usuario u
         JOIN Rol r ON u.id_rol = r.id_rol
         LEFT JOIN Profesional p ON u.id_profesional = p.id_profesional
+        LEFT JOIN Paciente pac ON u.id_paciente = pac.id_paciente
         WHERE u.username = ? AND u.password = ?
       `;
       const [rows] = await db.query(query, [username, password]);
@@ -555,7 +726,9 @@ async function startServer() {
             id_rol: user.id_rol,
             nombre_rol: user.nombre_rol,
             id_profesional: user.id_profesional,
-            profesional_nombre: user.id_profesional ? `${user.prof_nombre} ${user.prof_apellido}` : null
+            profesional_nombre: user.id_profesional ? `${user.prof_nombre} ${user.prof_apellido}` : null,
+            id_paciente: user.id_paciente,
+            paciente_nombre: user.id_paciente ? `${user.pac_nombre} ${user.pac_apellido}` : null
           }
         });
       } else {
